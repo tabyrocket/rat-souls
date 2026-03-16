@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://dmkp2dicjnoit"]
+
+[ext_resource type="PackedScene" uid="uid://3kuq0wfqgwca" path="res://characters/player/player.tscn" id="1_g7g4h"]
+[ext_resource type="Texture2D" uid="uid://mu440am4ewul" path="res://assets/world/quadrangle_sunny_4k.exr" id="2_j8ivh"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_g7g4h"]
+size = Vector3(19.95948, 0.26208496, 19.959686)
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_nd71p"]
+panorama = ExtResource("2_j8ivh")
+
+[sub_resource type="Sky" id="Sky_7ddre"]
+sky_material = SubResource("PanoramaSkyMaterial_nd71p")
+
+[sub_resource type="Environment" id="Environment_qjeyg"]
+background_mode = 2
+background_energy_multiplier = 2.0
+sky = SubResource("Sky_7ddre")
+
+[node name="TestScene" type="Node3D" unique_id=1580742955]
+
+[node name="Player" parent="." unique_id=1272587789 instance=ExtResource("1_g7g4h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.88678, 0)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=383803660]
+size = Vector3(20, 0.25, 20)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="CSGBox3D" unique_id=357698481]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CSGBox3D/StaticBody3D" unique_id=1953772139]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.015583038, -0.003112793, 0.01571083)
+shape = SubResource("BoxShape3D_g7g4h")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1509388158]
+transform = Transform3D(1, 0, 0, 0, -0.4183268, 0.90829664, 0, -0.90829664, -0.4183268, 0, 17.952576, 7.8374577)
+light_color = Color(1, 1, 0.7764706, 1)
+light_energy = 1.5
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1693026895]
+environment = SubResource("Environment_qjeyg")
