@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://3kuq0wfqgwca"]
 
 [ext_resource type="Script" uid="uid://spappu2fk6ei" path="res://characters/player/player.gd" id="1_508ok"]
+[ext_resource type="AudioStream" uid="uid://cdxaqenhkkuvi" path="res://assets/sound/sfx/dash.mp3" id="2_xxgcw"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6p3mc"]
 
@@ -22,3 +23,7 @@ transform = Transform3D(1, 0, 0, 0, 0.9659258, 0.25881904, 0, -0.25881904, 0.965
 
 [node name="CSGTorus3D" type="CSGTorus3D" parent="." unique_id=411861124]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.444, -0.383)
+
+[node name="DodgeSFX" type="AudioStreamPlayer3D" parent="." unique_id=1654719454]
+stream = ExtResource("2_xxgcw")
+bus = &"SFX"

@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://3kuq0wfqgwca" path="res://characters/player/player.tscn" id="1_g7g4h"]
 [ext_resource type="Texture2D" uid="uid://mu440am4ewul" path="res://assets/world/quadrangle_sunny_4k.exr" id="2_j8ivh"]
 [ext_resource type="Texture2D" uid="uid://dk7pyoxf07ucc" path="res://icon.svg" id="2_nd71p"]
+[ext_resource type="AudioStream" uid="uid://coynmlws2v3om" path="res://assets/sound/bgm/challenge_music.mp3" id="4_7ddre"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7ddre"]
 albedo_texture = ExtResource("2_nd71p")
@@ -37,3 +38,8 @@ shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1693026895]
 environment = SubResource("Environment_qjeyg")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=711614748]
+stream = ExtResource("4_7ddre")
+autoplay = true
+bus = &"BGM"
