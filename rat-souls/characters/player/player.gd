@@ -2,7 +2,8 @@ extends CharacterBody3D
 
 @onready var camera_pivot = $CameraPivot
 
-var mouse_sensitivity = 0.002
+@export var mouse_sensitivity = 0.002
+@export var controller_look_sensitivity: float = 2.0
 @export var min_look_angle_deg: float = -60.0
 @export var max_look_angle_deg: float = 20.0
 
@@ -20,6 +21,11 @@ func _input(event):
 		camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, deg_to_rad(min_look_angle_deg), deg_to_rad(max_look_angle_deg))
 
 func _physics_process(delta):
+	var look_input = Input.get_vector("look_left", "look_right", "look_up", "look_down")
+	if look_input != Vector2.ZERO:
+		rotate_y(-look_input.x * controller_look_sensitivity * delta)
+		camera_pivot.rotation.x -= look_input.y * controller_look_sensitivity * delta
+		camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, deg_to_rad(min_look_angle_deg), deg_to_rad(max_look_angle_deg))
 
 	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 
