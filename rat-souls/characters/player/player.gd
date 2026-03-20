@@ -12,9 +12,10 @@ extends CharacterBody3D
 @export var controller_look_sensitivity: float = 2.0
 @export var min_look_angle_deg: float = -60.0
 @export var max_look_angle_deg: float = 20.0
-@export var lock_on_range: float = 15.0
+@export var lock_on_range: float = 30.0
 @export var lock_on_height_offset: float = -2.0
 @export var lock_rotation_speed: float = 10.0
+@export var lock_camera_look_speed: float = 8.0
 
 # Movement tuning
 @export var speed: float = 6.0
@@ -131,7 +132,13 @@ func _update_lock_on_orientation(delta: float) -> void:
 
 	var target_rotation: float = atan2(lock_direction.x, lock_direction.z)
 	rotation.y = lerp_angle(rotation.y, target_rotation, lock_rotation_speed * delta)
-	camera_pivot.look_at(target_pos, Vector3.UP)
+
+	# Smooth camera orientation toward target to avoid lock-on snap.
+	var current_transform: Transform3D = camera_pivot.global_transform
+	var desired_transform: Transform3D = current_transform.looking_at(target_pos, Vector3.UP)
+	var blend: float = clamp(lock_camera_look_speed * delta, 0.0, 1.0)
+	current_transform.basis = current_transform.basis.slerp(desired_transform.basis, blend)
+	camera_pivot.global_transform = current_transform
 
 
 func _has_lock_target() -> bool:
