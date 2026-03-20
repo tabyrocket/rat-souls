@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://mu440am4ewul" path="res://assets/world/quadrangle_sunny_4k.exr" id="2_j8ivh"]
 [ext_resource type="Texture2D" uid="uid://dk7pyoxf07ucc" path="res://icon.svg" id="2_nd71p"]
 [ext_resource type="AudioStream" uid="uid://coynmlws2v3om" path="res://assets/sound/bgm/challenge_music.mp3" id="4_7ddre"]
+[ext_resource type="PackedScene" uid="uid://dn2gm5k3ab7b1" path="res://characters/enemies/cat_enemy.tscn" id="5_qjeyg"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7ddre"]
 albedo_texture = ExtResource("2_nd71p")
@@ -43,3 +44,6 @@ environment = SubResource("Environment_qjeyg")
 stream = ExtResource("4_7ddre")
 autoplay = true
 bus = &"BGM"
+
+[node name="CatEnemy" parent="." unique_id=1927594226 instance=ExtResource("5_qjeyg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25736904, 1.718104, 3.3215923)

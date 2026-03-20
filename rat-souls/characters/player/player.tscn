@@ -11,6 +11,9 @@ albedo_texture = ExtResource("2_exd8k")
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_dnjla"]
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_exd8k"]
+size = Vector3(0.8, 0.8, 1.2)
+
 [node name="Player" type="CharacterBody3D" unique_id=1272587789]
 script = ExtResource("1_508ok")
 
@@ -29,3 +32,12 @@ transform = Transform3D(1, 0, 0, 0, 0.9659258, 0.25881904, 0, -0.25881904, 0.965
 [node name="DodgeSFX" type="AudioStreamPlayer3D" parent="." unique_id=1654719454]
 stream = ExtResource("2_xxgcw")
 bus = &"SFX"
+
+[node name="AttackArea" type="Area3D" parent="." unique_id=1262814428]
+monitoring = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="AttackArea" unique_id=2005295532]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39671075, 1.0789461)
+shape = SubResource("BoxShape3D_exd8k")
+
+[connection signal="body_entered" from="AttackArea" to="." method="_on_attack_area_body_entered"]
