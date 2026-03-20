@@ -3,14 +3,15 @@ extends CharacterBody3D
 # Node references
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var dodge_sfx: AudioStreamPlayer3D = $DodgeSFX
+@onready var damaged_sfx: AudioStreamPlayer3D = $DamagedSFX
 @onready var visual_model: MeshInstance3D = $MeshInstance3D
 @onready var attack_area: Area3D = $AttackArea
 
 # Camera tuning
 @export var mouse_sensitivity: float = 0.002
 @export var controller_look_sensitivity: float = 2.0
-@export var min_look_angle_deg: float = -60.0
-@export var max_look_angle_deg: float = 20.0
+var min_look_angle_deg: float = -60.0
+var max_look_angle_deg: float = 20.0
 
 # Movement tuning
 var speed: float = 6.0
@@ -36,6 +37,13 @@ var is_attacking: bool = false
 var attack_timer: float = 0.0
 var attack_cooldown_timer: float = 0.0
 var hit_bodies: Array = []
+
+var is_hit: bool = false
+var hit_timer: float = 0.0
+@export var stun_duration: float = 1.0
+
+# Health
+var health = 5
 
 
 func _ready() -> void:
@@ -102,6 +110,8 @@ func _get_move_direction(cam_basis: Basis) -> Vector3:
 
 
 func _try_start_attack() -> void:
+	if is_hit:
+		return
 	if Input.is_action_just_pressed("attack") and attack_cooldown_timer <= 0.0 and not is_attacking:
 		hit_bodies.clear()
 		is_attacking = true
@@ -122,6 +132,8 @@ func _update_attack(delta: float) -> void:
 
 
 func _try_start_dodge(direction: Vector3, cam_basis: Basis) -> void:
+	if is_hit:
+		return
 	if Input.is_action_just_pressed("dodge") and dodge_cooldown_timer <= 0.0 and not is_dodging:
 		is_dodging = true
 		dodge_timer = dodge_duration
@@ -135,7 +147,15 @@ func _try_start_dodge(direction: Vector3, cam_basis: Basis) -> void:
 
 
 func _update_horizontal_velocity(direction: Vector3, delta: float) -> void:
-	if is_dodging:
+	if is_hit:
+		hit_timer -= delta
+		if is_on_floor():
+			velocity.x = move_toward(velocity.x, 0, speed * 2 * delta)
+			velocity.z = move_toward(velocity.z, 0, speed * 2 * delta)
+		
+		if hit_timer <= 0.0:
+			is_hit = false
+	elif is_dodging:
 		dodge_timer -= delta
 		velocity.x = dodge_direction.x * dodge_speed
 		velocity.z = dodge_direction.z * dodge_speed
@@ -172,4 +192,26 @@ func _lock_rotation_constraints() -> void:
 func _on_attack_area_body_entered(body: Node3D) -> void:
 	if is_attacking and body.has_method("take_damage") and not body in hit_bodies:
 		hit_bodies.append(body)
-		body.take_damage(1)
+		body.take_damage(1, self)
+
+
+# Take damage from enemy
+func take_damage(amount, source):
+	# Check the source of damage
+	if source == null or source == self or not source.is_in_group("enemy"):
+		return
+	health -= amount
+	damaged_sfx.play()
+	print("Player hit! Health:", health)
+	
+	is_attacking = false
+	attack_area.monitoring = false
+	visual_model.scale = Vector3.ONE
+	is_dodging = false
+	is_hit = true
+	hit_timer = stun_duration
+	velocity = (global_position - source.global_position).normalized() * 10.0
+	velocity.y = 1.5
+	
+	if health <= 0:
+		print("Player died")
