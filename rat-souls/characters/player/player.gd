@@ -2,6 +2,7 @@ extends CharacterBody3D
 
 # Node references
 @onready var camera_pivot: Node3D = $CameraPivot
+@onready var camera_3d: Camera3D = $CameraPivot/Camera3D
 @onready var dodge_sfx: AudioStreamPlayer3D = $DodgeSFX
 @onready var damaged_sfx: AudioStreamPlayer3D = $DamagedSFX
 @onready var visual_model: MeshInstance3D = $MeshInstance3D
@@ -16,6 +17,9 @@ extends CharacterBody3D
 @export var lock_on_height_offset: float = -2.0
 @export var lock_rotation_speed: float = 10.0
 @export var lock_camera_look_speed: float = 8.0
+@export var lock_switch_stick_threshold: float = 0.7
+@export var lock_switch_release_threshold: float = 0.35
+@export var lock_switch_mouse_threshold: float = 120.0
 
 # Movement tuning
 @export var speed: float = 6.0
@@ -43,6 +47,8 @@ var attack_cooldown_timer: float = 0.0
 var hit_bodies: Array[Node] = []
 var lock_target: Node3D = null
 var is_locked_on: bool = false
+var lock_switch_axis_ready: bool = true
+var lock_switch_mouse_accum_x: float = 0.0
 
 var is_hit: bool = false
 var hit_timer: float = 0.0
@@ -59,8 +65,12 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseMotion and not is_locked_on:
-		_apply_look_input(Vector2(event.relative.x, event.relative.y), mouse_sensitivity)
+	if event is InputEventMouseMotion:
+		var motion_event: InputEventMouseMotion = event
+		if is_locked_on:
+			_process_lock_switch_mouse(motion_event.relative.x)
+		else:
+			_apply_look_input(Vector2(motion_event.relative.x, motion_event.relative.y), mouse_sensitivity)
 
 
 func _physics_process(delta: float) -> void:
@@ -107,17 +117,25 @@ func _handle_lock_on_toggle() -> void:
 
 func _validate_lock_target() -> void:
 	if is_locked_on and not is_instance_valid(lock_target):
-		_clear_lock_target()
+		var next_target: Node3D = find_lock_target()
+		if next_target != null:
+			_set_lock_target(next_target)
+		else:
+			_clear_lock_target()
 
 
 func _set_lock_target(target: Node3D) -> void:
 	lock_target = target
 	is_locked_on = target != null
+	lock_switch_mouse_accum_x = 0.0
+	lock_switch_axis_ready = true
 
 
 func _clear_lock_target() -> void:
 	lock_target = null
 	is_locked_on = false
+	lock_switch_mouse_accum_x = 0.0
+	lock_switch_axis_ready = true
 
 
 func _update_lock_on_orientation(delta: float) -> void:
@@ -175,9 +193,106 @@ func find_lock_target() -> Node3D:
 	return closest
 
 
+func _process_lock_switch_axis(look_x: float) -> void:
+	if not _has_lock_target():
+		return
+
+	if not lock_switch_axis_ready:
+		if abs(look_x) <= lock_switch_release_threshold:
+			lock_switch_axis_ready = true
+		return
+
+	if look_x >= lock_switch_stick_threshold:
+		_try_switch_lock_target(1.0)
+		lock_switch_axis_ready = false
+	elif look_x <= -lock_switch_stick_threshold:
+		_try_switch_lock_target(-1.0)
+		lock_switch_axis_ready = false
+
+
+func _process_lock_switch_mouse(mouse_delta_x: float) -> void:
+	if not _has_lock_target():
+		return
+
+	lock_switch_mouse_accum_x += mouse_delta_x
+
+	if lock_switch_mouse_accum_x >= lock_switch_mouse_threshold:
+		_try_switch_lock_target(1.0)
+		lock_switch_mouse_accum_x = 0.0
+	elif lock_switch_mouse_accum_x <= -lock_switch_mouse_threshold:
+		_try_switch_lock_target(-1.0)
+		lock_switch_mouse_accum_x = 0.0
+
+
+func _try_switch_lock_target(direction_sign: float) -> void:
+	if not _has_lock_target():
+		return
+
+	var next_target: Node3D = _find_lock_target_in_screen_direction(direction_sign)
+	if next_target != null:
+		_set_lock_target(next_target)
+
+
+func _find_lock_target_in_screen_direction(direction_sign: float) -> Node3D:
+	if not _has_lock_target() or direction_sign == 0.0:
+		return null
+
+	var current_x: float = _get_target_screen_x(lock_target)
+	if is_inf(current_x):
+		return null
+
+	var enemies: Array = get_tree().get_nodes_in_group("enemy")
+	var best_target: Node3D = null
+	var best_screen_delta: float = INF
+	var best_world_dist: float = INF
+
+	for e in enemies:
+		if not is_instance_valid(e) or not (e is Node3D):
+			continue
+
+		var enemy: Node3D = e
+		if enemy == lock_target:
+			continue
+
+		var world_dist: float = global_position.distance_to(enemy.global_position)
+		if world_dist > lock_on_range:
+			continue
+
+		var candidate_x: float = _get_target_screen_x(enemy)
+		if is_inf(candidate_x):
+			continue
+
+		var screen_delta: float = candidate_x - current_x
+		if direction_sign > 0.0 and screen_delta <= 0.0:
+			continue
+		if direction_sign < 0.0 and screen_delta >= 0.0:
+			continue
+
+		var abs_delta: float = abs(screen_delta)
+		if abs_delta < best_screen_delta or (is_equal_approx(abs_delta, best_screen_delta) and world_dist < best_world_dist):
+			best_target = enemy
+			best_screen_delta = abs_delta
+			best_world_dist = world_dist
+
+	return best_target
+
+
+func _get_target_screen_x(target: Node3D) -> float:
+	if camera_3d == null:
+		return INF
+
+	var target_pos: Vector3 = target.global_position + Vector3(0.0, lock_on_height_offset, 0.0)
+	if camera_3d.is_position_behind(target_pos):
+		return INF
+
+	return camera_3d.unproject_position(target_pos).x
+
+
 func _process_controller_look(delta: float) -> void:
 	var look_input: Vector2 = Input.get_vector("look_left", "look_right", "look_up", "look_down")
-	if look_input != Vector2.ZERO and not is_locked_on:
+	if is_locked_on:
+		_process_lock_switch_axis(look_input.x)
+	elif look_input != Vector2.ZERO:
 		_apply_look_input(look_input, controller_look_sensitivity * delta)
 
 

@@ -1,7 +1,8 @@
 extends CharacterBody3D
 
 # Settings
-@export var speed: float = 4.0
+@export var health: int = 5
+@export var speed: float = 3.0
 @export var attack_range: float = 2.0
 @export var attack_damage: int = 1
 @export var attack_windup: float = 0.6
@@ -18,7 +19,6 @@ var state: State = State.CHASE
 var attack_timer: float = 0.0
 var cooldown_timer: float = 0.0
 var hit_timer: float = 0.0
-var health: int = 10
 var hit_bodies: Array[Node] = []
 
 # References
