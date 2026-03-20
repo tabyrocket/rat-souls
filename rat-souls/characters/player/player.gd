@@ -10,12 +10,15 @@ extends CharacterBody3D
 # Camera tuning
 @export var mouse_sensitivity: float = 0.002
 @export var controller_look_sensitivity: float = 2.0
-var min_look_angle_deg: float = -60.0
-var max_look_angle_deg: float = 20.0
+@export var min_look_angle_deg: float = -60.0
+@export var max_look_angle_deg: float = 20.0
+@export var lock_on_range: float = 15.0
+@export var lock_on_height_offset: float = -2.0
+@export var lock_rotation_speed: float = 10.0
 
 # Movement tuning
-var speed: float = 6.0
-var player_model_rotation_speed: float = 10.0
+@export var speed: float = 6.0
+@export var player_model_rotation_speed: float = 10.0
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # Dodge tuning
@@ -36,7 +39,9 @@ var dodge_direction: Vector3 = Vector3.ZERO
 var is_attacking: bool = false
 var attack_timer: float = 0.0
 var attack_cooldown_timer: float = 0.0
-var hit_bodies: Array = []
+var hit_bodies: Array[Node] = []
+var lock_target: Node3D = null
+var is_locked_on: bool = false
 
 var is_hit: bool = false
 var hit_timer: float = 0.0
@@ -53,22 +58,24 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseMotion:
+	if event is InputEventMouseMotion and not is_locked_on:
 		_apply_look_input(Vector2(event.relative.x, event.relative.y), mouse_sensitivity)
 
 
 func _physics_process(delta: float) -> void:
 	_update_timers(delta)
+	_handle_lock_on_toggle()
+	_validate_lock_target()
 	_update_camera_follow()
 	_process_controller_look(delta)
 
-	var cam_basis: Basis = camera_pivot.global_transform.basis
-	var direction: Vector3 = _get_move_direction(cam_basis)
+	var direction: Vector3 = _get_move_direction()
 
 	_try_start_attack()
 	_update_attack(delta)
-	_try_start_dodge(direction, cam_basis)
+	_try_start_dodge(direction)
 	_update_horizontal_velocity(direction, delta)
+	_update_lock_on_orientation(delta)
 
 	_apply_gravity(delta)
 	_lock_rotation_constraints()
@@ -86,9 +93,74 @@ func _update_camera_follow() -> void:
 	camera_pivot.global_position = global_position + camera_offset
 
 
+func _handle_lock_on_toggle() -> void:
+	if not Input.is_action_just_pressed("lock_on"):
+		return
+
+	if is_locked_on:
+		_clear_lock_target()
+		return
+
+	_set_lock_target(find_lock_target())
+
+
+func _validate_lock_target() -> void:
+	if is_locked_on and not is_instance_valid(lock_target):
+		_clear_lock_target()
+
+
+func _set_lock_target(target: Node3D) -> void:
+	lock_target = target
+	is_locked_on = target != null
+
+
+func _clear_lock_target() -> void:
+	lock_target = null
+	is_locked_on = false
+
+
+func _update_lock_on_orientation(delta: float) -> void:
+	if not _has_lock_target():
+		return
+
+	var target_pos: Vector3 = lock_target.global_position + Vector3(0.0, lock_on_height_offset, 0.0)
+	var lock_direction: Vector3 = target_pos - global_position
+	lock_direction.y = 0.0
+	if lock_direction.length_squared() <= 0.000001:
+		return
+
+	var target_rotation: float = atan2(lock_direction.x, lock_direction.z)
+	rotation.y = lerp_angle(rotation.y, target_rotation, lock_rotation_speed * delta)
+	camera_pivot.look_at(target_pos, Vector3.UP)
+
+
+func _has_lock_target() -> bool:
+	return is_locked_on and is_instance_valid(lock_target)
+
+
+func find_lock_target() -> Node3D:
+	var enemies: Array = get_tree().get_nodes_in_group("enemy")
+
+	var closest: Node3D = null
+	var closest_dist: float = INF
+
+	for e in enemies:
+		if not is_instance_valid(e) or not (e is Node3D):
+			continue
+
+		var enemy: Node3D = e
+		var dist: float = global_position.distance_to(enemy.global_position)
+
+		if dist < closest_dist and dist <= lock_on_range:
+			closest = enemy
+			closest_dist = dist
+
+	return closest
+
+
 func _process_controller_look(delta: float) -> void:
 	var look_input: Vector2 = Input.get_vector("look_left", "look_right", "look_up", "look_down")
-	if look_input != Vector2.ZERO:
+	if look_input != Vector2.ZERO and not is_locked_on:
 		_apply_look_input(look_input, controller_look_sensitivity * delta)
 
 
@@ -102,11 +174,33 @@ func _apply_look_input(look_input: Vector2, sensitivity: float) -> void:
 	)
 
 
-func _get_move_direction(cam_basis: Basis) -> Vector3:
+func _get_move_direction() -> Vector3:
 	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var direction: Vector3 = cam_basis * Vector3(input_dir.x, 0.0, input_dir.y)
-	direction.y = 0.0
-	return direction.normalized()
+	if input_dir == Vector2.ZERO:
+		return Vector3.ZERO
+
+	if _has_lock_target():
+		var lock_forward: Vector3 = _get_lock_forward_direction()
+		var lock_right: Vector3 = lock_forward.cross(Vector3.UP).normalized()
+		var lock_move: Vector3 = lock_right * input_dir.x + lock_forward * -input_dir.y
+		return lock_move.normalized()
+
+	var cam_basis: Basis = camera_pivot.global_transform.basis
+	var free_move: Vector3 = cam_basis * Vector3(input_dir.x, 0.0, input_dir.y)
+	free_move.y = 0.0
+	return free_move.normalized()
+
+
+func _get_lock_forward_direction() -> Vector3:
+	if not _has_lock_target():
+		return -global_transform.basis.z
+
+	var to_target: Vector3 = lock_target.global_position - global_position
+	to_target.y = 0.0
+	if to_target.length_squared() <= 0.000001:
+		return -global_transform.basis.z
+
+	return to_target.normalized()
 
 
 func _try_start_attack() -> void:
@@ -131,7 +225,7 @@ func _update_attack(delta: float) -> void:
 			attack_area.monitoring = false
 
 
-func _try_start_dodge(direction: Vector3, cam_basis: Basis) -> void:
+func _try_start_dodge(direction: Vector3) -> void:
 	if is_hit:
 		return
 	if Input.is_action_just_pressed("dodge") and dodge_cooldown_timer <= 0.0 and not is_dodging:
@@ -142,8 +236,13 @@ func _try_start_dodge(direction: Vector3, cam_basis: Basis) -> void:
 
 		dodge_direction = direction
 		if dodge_direction == Vector3.ZERO:
-			# If idle, dodge backward relative to camera.
-			dodge_direction = (cam_basis * Vector3.BACK).normalized()
+			dodge_direction = _get_idle_dodge_direction()
+
+
+func _get_idle_dodge_direction() -> Vector3:
+	if _has_lock_target():
+		return -_get_lock_forward_direction()
+	return (camera_pivot.global_transform.basis * Vector3.BACK).normalized()
 
 
 func _update_horizontal_velocity(direction: Vector3, delta: float) -> void:
@@ -170,8 +269,9 @@ func _update_horizontal_velocity(direction: Vector3, delta: float) -> void:
 		velocity.x = direction.x * speed
 		velocity.z = direction.z * speed
 
-		var target_angle: float = atan2(direction.x, direction.z)
-		rotation.y = lerp_angle(rotation.y, target_angle, player_model_rotation_speed * delta)
+		if not _has_lock_target():
+			var target_angle: float = atan2(direction.x, direction.z)
+			rotation.y = lerp_angle(rotation.y, target_angle, player_model_rotation_speed * delta)
 	else:
 		velocity.x = 0.0
 		velocity.z = 0.0
@@ -196,7 +296,7 @@ func _on_attack_area_body_entered(body: Node3D) -> void:
 
 
 # Take damage from enemy
-func take_damage(amount, source):
+func take_damage(amount, source) -> void:
 	# Check the source of damage
 	if source == null or source == self or not source.is_in_group("enemy"):
 		return

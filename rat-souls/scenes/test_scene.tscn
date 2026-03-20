@@ -46,4 +46,4 @@ autoplay = true
 bus = &"BGM"
 
 [node name="CatEnemy" parent="." unique_id=1927594226 instance=ExtResource("5_qjeyg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25736904, 1.718104, 3.3215923)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.07328606, 1.1250005, 12.388373)
