@@ -14,6 +14,9 @@ albedo_texture = ExtResource("2_qertd")
 [sub_resource type="BoxShape3D" id="BoxShape3D_qertd"]
 size = Vector3(1.5, 1, 1)
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_wsesy"]
+radius = 3.0
+
 [node name="CatEnemy" type="CharacterBody3D" unique_id=1927594226 groups=["enemy"]]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 script = ExtResource("1_yv15o")
@@ -36,5 +39,10 @@ shape = SubResource("BoxShape3D_qertd")
 [node name="DamagedSFX" type="AudioStreamPlayer3D" parent="." unique_id=567290231]
 stream = ExtResource("3_wsesy")
 bus = &"SFX"
+
+[node name="SeparationArea" type="Area3D" parent="." unique_id=1460488261]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SeparationArea" unique_id=1641678320]
+shape = SubResource("SphereShape3D_wsesy")
 
 [connection signal="body_entered" from="AttackArea" to="." method="_on_attack_area_body_entered"]
