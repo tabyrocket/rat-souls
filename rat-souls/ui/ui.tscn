@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://jnkio4dvpi3"]
+
+[ext_resource type="Script" uid="uid://bbukh0pkuh5gf" path="res://ui/ui.gd" id="1_ks8t7"]
+[ext_resource type="Texture2D" uid="uid://h5pjijcmj8xc" path="res://assets/x.png" id="1_nb4k0"]
+
+[node name="UI" type="CanvasLayer" unique_id=855579192]
+script = ExtResource("1_ks8t7")
+
+[node name="target_indicator" type="TextureRect" parent="." unique_id=694350376]
+offset_right = 27.0
+offset_bottom = 27.0
+texture = ExtResource("1_nb4k0")
+expand_mode = 1

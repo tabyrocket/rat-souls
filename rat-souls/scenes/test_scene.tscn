@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dk7pyoxf07ucc" path="res://icon.svg" id="2_nd71p"]
 [ext_resource type="AudioStream" uid="uid://coynmlws2v3om" path="res://assets/sound/bgm/challenge_music.mp3" id="4_7ddre"]
 [ext_resource type="PackedScene" uid="uid://dn2gm5k3ab7b1" path="res://characters/enemies/cat_enemy.tscn" id="5_qjeyg"]
+[ext_resource type="PackedScene" uid="uid://jnkio4dvpi3" path="res://ui/ui.tscn" id="6_3qnke"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7ddre"]
 albedo_texture = ExtResource("2_nd71p")
@@ -47,3 +48,5 @@ bus = &"BGM"
 
 [node name="CatEnemy" parent="." unique_id=1927594226 instance=ExtResource("5_qjeyg")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.07328606, 1.1250005, 12.388373)
+
+[node name="UI" parent="." unique_id=855579192 instance=ExtResource("6_3qnke")]

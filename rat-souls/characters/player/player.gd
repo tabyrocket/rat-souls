@@ -138,6 +138,16 @@ func _has_lock_target() -> bool:
 	return is_locked_on and is_instance_valid(lock_target)
 
 
+func has_lock_target() -> bool:
+	return _has_lock_target()
+
+
+func get_lock_target() -> Node3D:
+	if _has_lock_target():
+		return lock_target
+	return null
+
+
 func find_lock_target() -> Node3D:
 	var enemies: Array = get_tree().get_nodes_in_group("enemy")
 
