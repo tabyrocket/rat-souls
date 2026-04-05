@@ -9,6 +9,8 @@ extends CharacterBody3D
 @export var attack_duration: float = 0.2
 @export var attack_cooldown: float = 1.0
 @export var stun_duration: float = 1.0
+@export var parry_stun_duration: float = 5.0
+@export var stunned_damage_multiplier: float = 2.0
 @export var separation_weight: float = 2.4
 @export var hard_separation_distance: float = 2.0
 @export var chase_variation_interval_min: float = 0.45
@@ -23,13 +25,14 @@ extends CharacterBody3D
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
-enum State { CHASE, ATTACK, COOLDOWN, HIT }
+enum State { CHASE, ATTACK, COOLDOWN, HIT, STUNNED }
 
 # Runtime state
 var state: State = State.CHASE
 var attack_timer: float = 0.0
 var cooldown_timer: float = 0.0
 var hit_timer: float = 0.0
+var parry_stun_timer: float = 0.0
 var hit_bodies: Array[Node] = []
 var chase_variation_timer: float = 0.0
 var chase_lateral_sign: float = 1.0
@@ -70,6 +73,8 @@ func _physics_process(delta: float) -> void:
 	match state:
 		State.HIT:
 			_state_hit(delta)
+		State.STUNNED:
+			_state_stunned(delta)
 		State.CHASE:
 			_state_chase(delta, direction_to_player, distance_to_player)
 		State.ATTACK:
@@ -90,6 +95,18 @@ func _state_hit(delta: float) -> void:
 		state = State.CHASE
 
 
+func _state_stunned(delta: float) -> void:
+	parry_stun_timer -= delta
+	velocity.x = 0.0
+	velocity.z = 0.0
+
+	if parry_stun_timer <= 0.0:
+		_reset_attack_runtime_state()
+		parry_stun_timer = 0.0
+		state = State.CHASE
+		print("Cat recovered from parry stun.")
+
+
 func _state_chase(delta: float, direction_to_player: Vector3, distance_to_player: float) -> void:
 	if distance_to_player > attack_range:
 		var chase_direction: Vector3 = _get_chase_direction(delta, direction_to_player)
@@ -105,6 +122,7 @@ func _state_attack(delta: float) -> void:
 	attack_timer -= delta
 
 	if attack_timer > attack_duration:
+		attack_area.monitoring = false
 		visual_model.scale = Vector3(1.2, 0.8, 1.2)
 	else:
 		attack_area.monitoring = true
@@ -121,18 +139,36 @@ func _state_cooldown(delta: float) -> void:
 
 
 func _enter_attack_state() -> void:
+	_reset_attack_runtime_state(false)
 	state = State.ATTACK
 	attack_timer = attack_windup
 	velocity.x = 0.0
 	velocity.z = 0.0
+	print("Cat attack started. Windup:", attack_windup, "Active window:", attack_duration)
 
 
 func _finish_attack_and_enter_cooldown() -> void:
 	attack_area.monitoring = false
 	visual_model.scale = Vector3.ONE
+	attack_timer = 0.0
 	state = State.COOLDOWN
 	cooldown_timer = attack_cooldown
 	hit_bodies.clear()
+	print("Cat attack finished. Entering cooldown:", attack_cooldown)
+
+
+func _reset_attack_runtime_state(reset_cooldown: bool = true) -> void:
+	attack_area.set_deferred("monitoring", false)
+	visual_model.scale = Vector3.ONE
+	attack_timer = 0.0
+	hit_bodies.clear()
+	if reset_cooldown:
+		cooldown_timer = 0.0
+	print("Cat attack runtime reset. reset_cooldown:", reset_cooldown)
+
+
+func _is_attack_hit_window_active() -> bool:
+	return state == State.ATTACK and attack_area.monitoring and attack_timer > 0.0 and attack_timer <= attack_duration
 
 
 func _apply_gravity(delta: float) -> void:
@@ -276,30 +312,71 @@ func take_damage(amount, source) -> void:
 	if source == null or source == self or not source.is_in_group("player"):
 		return
 
-	health -= amount
+	var damage_multiplier: float = 1.0
+	if state == State.STUNNED:
+		damage_multiplier = stunned_damage_multiplier
+		print("Cat is stunned. Applying damage multiplier:", stunned_damage_multiplier)
+
+	var final_damage: int = int(max(round(float(amount) * damage_multiplier), 1.0))
+	health -= final_damage
+
 	damaged_sfx.play()
-	print("Cat hit! Health:", health)
+	print("Cat hit! Base damage:", amount, "Final damage:", final_damage, "Health:", health)
 
 	if health <= 0:
 		queue_free()
 		return
 
-	attack_area.monitoring = false
-	visual_model.scale = Vector3.ONE
-	hit_bodies.clear()
+	if state == State.STUNNED:
+		print("Cat was stunned and took damage; exiting stunned state.")
+		parry_stun_timer = 0.0
+		# Wake up from parry-stun and apply normal hit response
+		_reset_attack_runtime_state()
+		state = State.HIT
+		hit_timer = stun_duration
+		velocity = (global_position - source.global_position).normalized() * 12.0
+		velocity.y = 2.0
+		return
+
+	_reset_attack_runtime_state()
 	state = State.HIT
 	hit_timer = stun_duration
 	velocity = (global_position - source.global_position).normalized() * 12.0
 	velocity.y = 2.0
 
 
+func apply_parry_stun(duration: float = -1.0) -> void:
+	var resolved_duration: float = parry_stun_duration if duration < 0.0 else duration
+	if resolved_duration <= 0.0:
+		return
+
+	# Reset any running attack runtime state and apply a small knockback away from the player.
+	_reset_attack_runtime_state()
+	var knockback_force: float = 12.0 / 5.0
+	var dir: Vector3 = Vector3.ZERO
+	if _has_valid_player():
+		dir = (global_position - player.global_position).normalized()
+	# fallback direction if player not found
+	if dir.length_squared() <= 0.000001:
+		dir = (global_transform.basis.z).normalized()
+	velocity = dir * knockback_force
+	velocity.y = 1.0
+	state = State.STUNNED
+	parry_stun_timer = resolved_duration
+	print("Cat parry-stunned for", parry_stun_timer, "seconds. Knockback:", velocity)
+
+
 func _on_attack_area_body_entered(body: Node) -> void:
+	if not _is_attack_hit_window_active():
+		return
 	if body.has_method("take_damage") and not body in hit_bodies:
 		hit_bodies.append(body)
 		body.take_damage(attack_damage, self)
 
 
 func _apply_attack_hits() -> void:
+	if not _is_attack_hit_window_active():
+		return
 	for body in attack_area.get_overlapping_bodies():
 		if body.has_method("take_damage") and not body in hit_bodies:
 			hit_bodies.append(body)

@@ -39,8 +39,12 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @export var stamina_max: float = 100.0
 @export var stamina_attack_cost: float = 25.0
 @export var stamina_dodge_cost: float = 25.0
+@export var stamina_parry_cost: float = 10.0
 @export var stamina_regen_delay: float = 1.0
 @export var stamina_regen_rate: float = 50.0
+
+# Parry tuning
+@export var parry_duration: float = 1.0
 
 # Runtime state
 var camera_offset: Vector3
@@ -53,6 +57,8 @@ var dodge_direction: Vector3 = Vector3.ZERO
 var is_attacking: bool = false
 var attack_timer: float = 0.0
 var attack_cooldown_timer: float = 0.0
+var is_parrying: bool = false
+var parry_timer: float = 0.0
 var hit_bodies: Array[Node] = []
 var lock_target: Node3D = null
 var is_locked_on: bool = false
@@ -76,6 +82,8 @@ func _ready() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
+		if is_parrying:
+			return
 		var motion_event: InputEventMouseMotion = event
 		if is_locked_on:
 			_process_lock_switch_mouse(motion_event.relative.x)
@@ -89,6 +97,7 @@ func _physics_process(delta: float) -> void:
 	_validate_lock_target()
 	_update_camera_follow()
 	_process_controller_look(delta)
+	_try_start_parry()
 
 	var direction: Vector3 = _get_move_direction()
 
@@ -104,6 +113,13 @@ func _physics_process(delta: float) -> void:
 
 
 func _update_timers(delta: float) -> void:
+	if is_parrying:
+		parry_timer -= delta
+		if parry_timer <= 0.0:
+			is_parrying = false
+			parry_timer = 0.0
+			print("[Parry] Window ended.")
+
 	if dodge_cooldown_timer > 0.0:
 		dodge_cooldown_timer -= delta
 	if attack_cooldown_timer > 0.0:
@@ -153,6 +169,8 @@ func _clear_lock_target() -> void:
 
 
 func _update_lock_on_orientation(delta: float) -> void:
+	if is_parrying:
+		return
 	if not _has_lock_target():
 		return
 
@@ -303,6 +321,8 @@ func _get_target_screen_x(target: Node3D) -> float:
 
 
 func _process_controller_look(delta: float) -> void:
+	if is_parrying:
+		return
 	var look_input: Vector2 = Input.get_vector("look_left", "look_right", "look_up", "look_down")
 	if is_locked_on:
 		_process_lock_switch_axis(look_input.x)
@@ -321,6 +341,9 @@ func _apply_look_input(look_input: Vector2, sensitivity: float) -> void:
 
 
 func _get_move_direction() -> Vector3:
+	if is_parrying:
+		return Vector3.ZERO
+
 	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	if input_dir == Vector2.ZERO:
 		return Vector3.ZERO
@@ -350,11 +373,12 @@ func _get_lock_forward_direction() -> Vector3:
 
 
 func _try_start_attack() -> void:
-	if is_hit:
+	if is_hit or is_parrying:
 		return
 	if Input.is_action_just_pressed("attack") and attack_cooldown_timer <= 0.0 and not is_attacking:
 		# Require enough stamina to perform attack.
 		if stamina < stamina_attack_cost:
+			print("[Attack] Not enough stamina. Required:", stamina_attack_cost, "Current:", stamina)
 			return
 		stamina = max(stamina - stamina_attack_cost, 0.0)
 		stamina_time_since_consume = 0.0
@@ -367,6 +391,35 @@ func _try_start_attack() -> void:
 		visual_model.scale = Vector3(1.2, 0.8, 1.2)
 
 
+func _try_start_parry() -> void:
+	if is_hit or is_parrying:
+		return
+	if not Input.is_action_just_pressed("parry"):
+		return
+
+	if stamina < stamina_parry_cost:
+		print("[Parry] Not enough stamina. Required:", stamina_parry_cost, "Current:", stamina)
+		return
+
+	if is_attacking:
+		print("[Parry] Canceling active attack for parry.")
+	if is_dodging:
+		print("[Parry] Canceling active dodge for parry.")
+
+	stamina = max(stamina - stamina_parry_cost, 0.0)
+	stamina_time_since_consume = 0.0
+	is_attacking = false
+	attack_area.monitoring = false
+	visual_model.scale = Vector3.ONE
+	hit_bodies.clear()
+	is_dodging = false
+	is_parrying = true
+	parry_timer = parry_duration
+	velocity.x = 0.0
+	velocity.z = 0.0
+	print("[Parry] Started. Window:", parry_duration, "seconds. Stamina:", stamina)
+
+
 func _update_attack(delta: float) -> void:
 	if is_attacking:
 		attack_timer -= delta
@@ -377,11 +430,12 @@ func _update_attack(delta: float) -> void:
 
 
 func _try_start_dodge(direction: Vector3) -> void:
-	if is_hit:
+	if is_hit or is_parrying:
 		return
 	if Input.is_action_just_pressed("dodge") and dodge_cooldown_timer <= 0.0 and not is_dodging:
 		# Require enough stamina to dodge.
 		if stamina < stamina_dodge_cost:
+			print("[Dodge] Not enough stamina. Required:", stamina_dodge_cost, "Current:", stamina)
 			return
 		stamina = max(stamina - stamina_dodge_cost, 0.0)
 		stamina_time_since_consume = 0.0
@@ -410,6 +464,9 @@ func _update_horizontal_velocity(direction: Vector3, delta: float) -> void:
 		
 		if hit_timer <= 0.0:
 			is_hit = false
+	elif is_parrying:
+		velocity.x = 0.0
+		velocity.z = 0.0
 	elif is_dodging:
 		dodge_timer -= delta
 		velocity.x = dodge_direction.x * dodge_speed
@@ -451,11 +508,42 @@ func _on_attack_area_body_entered(body: Node3D) -> void:
 		body.take_damage(1, self)
 
 
+func _face_attack_side_toward(target: Node3D) -> void:
+	var to_target: Vector3 = target.global_position - global_position
+	to_target.y = 0.0
+	if to_target.length_squared() <= 0.000001:
+		return
+
+	# AttackArea sits on local +Z, so this yaw points the striking side toward target.
+	rotation.y = atan2(to_target.x, to_target.z)
+	print("[Parry] Facing attacker:", target.name)
+
+
 # Take damage from enemy
 func take_damage(amount, source) -> void:
 	# Check the source of damage
 	if source == null or source == self or not source.is_in_group("enemy"):
 		return
+
+	if is_parrying:
+		print("[Parry] SUCCESS. Blocked", amount, "damage from", source.name)
+		print("[Parry] Remaining parry window:", max(parry_timer, 0.0), "seconds")
+		if source is Node3D:
+			_face_attack_side_toward(source as Node3D)
+		else:
+			print("[Parry] Could not face attacker because source is not Node3D.")
+
+		if source.has_method("apply_parry_stun"):
+			source.apply_parry_stun()
+		else:
+			print("[Parry] Attacker has no apply_parry_stun() method:", source.name)
+
+		# Exit parry state on successful deflect
+		is_parrying = false
+		parry_timer = 0.0
+		print("[Parry] Player exited parry after successful deflect.")
+		return
+
 	health -= amount
 	damaged_sfx.play()
 	print("Player hit! Health:", health)
