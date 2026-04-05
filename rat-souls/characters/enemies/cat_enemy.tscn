@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://djui6rdfbh343" path="res://characters/enemies/cat_enemy.gd" id="1_yv15o"]
 [ext_resource type="Texture2D" uid="uid://bwlgmhpqgoe41" path="res://assets/images/cat.jpg" id="2_qertd"]
 [ext_resource type="AudioStream" uid="uid://oim60qq1hmr3" path="res://assets/sound/sfx/meowrgh.mp3" id="3_wsesy"]
+[ext_resource type="PackedScene" uid="uid://bhf4pe5ooixdl" path="res://characters/enemies/enemy_health_bar.tscn" id="4_637aq"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_eti82"]
 
@@ -39,6 +40,8 @@ shape = SubResource("BoxShape3D_qertd")
 [node name="DamagedSFX" type="AudioStreamPlayer3D" parent="." unique_id=567290231]
 stream = ExtResource("3_wsesy")
 bus = &"SFX"
+
+[node name="EnemyHealthBar" parent="." instance=ExtResource("4_637aq")]
 
 [node name="SeparationArea" type="Area3D" parent="." unique_id=1460488261]
 
