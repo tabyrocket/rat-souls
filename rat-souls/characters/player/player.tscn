@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://3kuq0wfqgwca"]
 
 [ext_resource type="Script" uid="uid://spappu2fk6ei" path="res://characters/player/player.gd" id="1_508ok"]
-[ext_resource type="Texture2D" uid="uid://b77r6rskatnws" path="res://assets/rat.jpg" id="2_5dc8e"]
+[ext_resource type="Texture2D" uid="uid://b77r6rskatnws" path="res://assets/images/rat.jpg" id="2_5dc8e"]
 [ext_resource type="AudioStream" uid="uid://cdxaqenhkkuvi" path="res://assets/sound/sfx/dash.mp3" id="2_xxgcw"]
 [ext_resource type="AudioStream" uid="uid://c72g7q7c1dovk" path="res://assets/sound/sfx/vine-boom.mp3" id="4_5dc8e"]
 

@@ -1,7 +1,28 @@
 [gd_scene format=3 uid="uid://jnkio4dvpi3"]
 
 [ext_resource type="Script" uid="uid://bbukh0pkuh5gf" path="res://ui/ui.gd" id="1_ks8t7"]
-[ext_resource type="Texture2D" uid="uid://h5pjijcmj8xc" path="res://assets/x.png" id="1_nb4k0"]
+[ext_resource type="Texture2D" uid="uid://h5pjijcmj8xc" path="res://assets/images/x.png" id="1_nb4k0"]
+[ext_resource type="Texture2D" uid="uid://cejfdt4qiyodg" path="res://assets/images/ratpfp.png" id="3_wl5ax"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ks8t7"]
+bg_color = Color(0.25552174, 2.6171097e-07, 1.2032688e-08, 1)
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tf0e0"]
+bg_color = Color(0.99999994, 0.22462073, 0.2147407, 1)
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wl5ax"]
+bg_color = Color(0.04732202, 0.16012794, 0.08257351, 1)
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vkava"]
+bg_color = Color(0.29877496, 0.5674968, 0.35507226, 1)
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
 
 [node name="UI" type="CanvasLayer" unique_id=855579192]
 script = ExtResource("1_ks8t7")
@@ -11,3 +32,36 @@ offset_right = 27.0
 offset_bottom = 27.0
 texture = ExtResource("1_nb4k0")
 expand_mode = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1353768931]
+custom_minimum_size = Vector2(300, 0)
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer" unique_id=517126767]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+texture = ExtResource("3_wl5ax")
+expand_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=2010564194]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HealthBar" type="ProgressBar" parent="HBoxContainer/VBoxContainer" unique_id=2006351932]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_ks8t7")
+theme_override_styles/fill = SubResource("StyleBoxFlat_tf0e0")
+step = 1.0
+value = 100.0
+show_percentage = false
+
+[node name="StaminaBar" type="ProgressBar" parent="HBoxContainer/VBoxContainer" unique_id=870747645]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_wl5ax")
+theme_override_styles/fill = SubResource("StyleBoxFlat_vkava")
+step = 1.0
+value = 100.0
+show_percentage = false

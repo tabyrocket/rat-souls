@@ -35,8 +35,17 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @export var attack_duration: float = 0.2
 @export var attack_cooldown: float = 0.4
 
+# Stamina tuning
+@export var stamina_max: float = 100.0
+@export var stamina_attack_cost: float = 25.0
+@export var stamina_dodge_cost: float = 25.0
+@export var stamina_regen_delay: float = 1.0
+@export var stamina_regen_rate: float = 50.0
+
 # Runtime state
 var camera_offset: Vector3
+var stamina: float = 100.0
+var stamina_time_since_consume: float = 0.0
 var is_dodging: bool = false
 var dodge_timer: float = 0.0
 var dodge_cooldown_timer: float = 0.0
@@ -62,6 +71,7 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	camera_offset = camera_pivot.position
 	camera_pivot.top_level = true
+	stamina = stamina_max
 
 
 func _input(event: InputEvent) -> void:
@@ -98,6 +108,10 @@ func _update_timers(delta: float) -> void:
 		dodge_cooldown_timer -= delta
 	if attack_cooldown_timer > 0.0:
 		attack_cooldown_timer -= delta
+	# Stamina regen: start after `stamina_regen_delay` seconds since last consume.
+	stamina_time_since_consume += delta
+	if stamina_time_since_consume >= stamina_regen_delay and stamina < stamina_max:
+		stamina = min(stamina + stamina_regen_rate * delta, stamina_max)
 
 
 func _update_camera_follow() -> void:
@@ -339,6 +353,11 @@ func _try_start_attack() -> void:
 	if is_hit:
 		return
 	if Input.is_action_just_pressed("attack") and attack_cooldown_timer <= 0.0 and not is_attacking:
+		# Require enough stamina to perform attack.
+		if stamina < stamina_attack_cost:
+			return
+		stamina = max(stamina - stamina_attack_cost, 0.0)
+		stamina_time_since_consume = 0.0
 		hit_bodies.clear()
 		is_attacking = true
 		attack_timer = attack_duration
@@ -361,6 +380,11 @@ func _try_start_dodge(direction: Vector3) -> void:
 	if is_hit:
 		return
 	if Input.is_action_just_pressed("dodge") and dodge_cooldown_timer <= 0.0 and not is_dodging:
+		# Require enough stamina to dodge.
+		if stamina < stamina_dodge_cost:
+			return
+		stamina = max(stamina - stamina_dodge_cost, 0.0)
+		stamina_time_since_consume = 0.0
 		is_dodging = true
 		dodge_timer = dodge_duration
 		dodge_cooldown_timer = dodge_cooldown

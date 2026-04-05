@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dn2gm5k3ab7b1"]
 
 [ext_resource type="Script" uid="uid://djui6rdfbh343" path="res://characters/enemies/cat_enemy.gd" id="1_yv15o"]
-[ext_resource type="Texture2D" uid="uid://bwlgmhpqgoe41" path="res://assets/cat.jpg" id="2_qertd"]
+[ext_resource type="Texture2D" uid="uid://bwlgmhpqgoe41" path="res://assets/images/cat.jpg" id="2_qertd"]
 [ext_resource type="AudioStream" uid="uid://oim60qq1hmr3" path="res://assets/sound/sfx/meowrgh.mp3" id="3_wsesy"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_eti82"]
