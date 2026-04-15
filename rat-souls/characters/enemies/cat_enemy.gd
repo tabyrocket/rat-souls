@@ -50,6 +50,7 @@ var star_rotation_speed: float = 6.0
 @onready var separation_area: Area3D = $SeparationArea
 @onready var visual_model: Node3D = $CatMesh
 @onready var damaged_sfx: AudioStreamPlayer3D = $DamagedSFX
+@onready var gong_sfx: AudioStreamPlayer3D = $GongSFX
 @onready var star: Node3D = get_node_or_null("Star") as Node3D
 
 
@@ -376,6 +377,7 @@ func apply_parry_stun(duration: float = -1.0) -> void:
 	velocity = dir * knockback_force
 	velocity.y = 1.0
 	state = State.STUNNED
+	gong_sfx.play()
 	parry_stun_timer = resolved_duration
 	if is_instance_valid(star):
 		star.rotation = Vector3.ZERO

@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://b6plhk6sut0kt" path="res://characters/enemies/orange-cat/cat-mesh_catface.jpg" id="3_ht1sg"]
 [ext_resource type="AudioStream" uid="uid://oim60qq1hmr3" path="res://assets/sound/sfx/meowrgh.mp3" id="3_wsesy"]
 [ext_resource type="PackedScene" uid="uid://bhf4pe5ooixdl" path="res://characters/enemies/enemy_health_bar.tscn" id="4_637aq"]
+[ext_resource type="AudioStream" uid="uid://dsb8ctnabkije" path="res://assets/sound/sfx/taco-bell-bong-sfx.mp3" id="6_ht1sg"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_r1i4n"]
 radius = 0.3
@@ -490,6 +491,10 @@ shape = SubResource("BoxShape3D_qertd")
 
 [node name="DamagedSFX" type="AudioStreamPlayer3D" parent="." unique_id=567290231]
 stream = ExtResource("3_wsesy")
+bus = &"SFX"
+
+[node name="GongSFX" type="AudioStreamPlayer3D" parent="." unique_id=697662906]
+stream = ExtResource("6_ht1sg")
 bus = &"SFX"
 
 [node name="EnemyHealthBar" parent="." unique_id=377402974 instance=ExtResource("4_637aq")]
