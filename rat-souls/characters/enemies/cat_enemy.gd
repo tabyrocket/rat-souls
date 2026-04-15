@@ -42,6 +42,7 @@ var boundary_strafe_sign: float = 1.0
 var boundary_strafe_timer: float = 0.0
 var smoothed_separation: Vector3 = Vector3.ZERO
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var star_rotation_speed: float = 6.0
 
 # References
 @onready var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
@@ -49,11 +50,14 @@ var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 @onready var separation_area: Area3D = $SeparationArea
 @onready var visual_model: Node3D = $CatMesh
 @onready var damaged_sfx: AudioStreamPlayer3D = $DamagedSFX
+@onready var star: Node3D = get_node_or_null("Star") as Node3D
 
 
 func _ready() -> void:
 	rng.seed = int(Time.get_ticks_usec()) + get_instance_id()
 	_refresh_chase_variation()
+	if is_instance_valid(star):
+		star.visible = false
 
 
 func _physics_process(delta: float) -> void:
@@ -100,7 +104,14 @@ func _state_stunned(delta: float) -> void:
 	velocity.x = 0.0
 	velocity.z = 0.0
 
+	if is_instance_valid(star):
+		star.visible = true
+		star.rotate_y(star_rotation_speed * delta)
+
 	if parry_stun_timer <= 0.0:
+		if is_instance_valid(star):
+			star.visible = false
+			star.rotation = Vector3.ZERO
 		_reset_attack_runtime_state()
 		parry_stun_timer = 0.0
 		state = State.CHASE
@@ -329,6 +340,9 @@ func take_damage(amount, source) -> void:
 
 	if state == State.STUNNED:
 		print("Cat was stunned and took damage; exiting stunned state.")
+		if is_instance_valid(star):
+			star.visible = false
+			star.rotation = Vector3.ZERO
 		parry_stun_timer = 0.0
 		# Wake up from parry-stun and apply normal hit response
 		_reset_attack_runtime_state()
@@ -363,6 +377,9 @@ func apply_parry_stun(duration: float = -1.0) -> void:
 	velocity.y = 1.0
 	state = State.STUNNED
 	parry_stun_timer = resolved_duration
+	if is_instance_valid(star):
+		star.rotation = Vector3.ZERO
+		star.visible = true
 	print("Cat parry-stunned for", parry_stun_timer, "seconds. Knockback:", velocity)
 
 

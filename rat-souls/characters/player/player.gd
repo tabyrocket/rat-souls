@@ -187,7 +187,7 @@ func _update_lock_on_orientation(delta: float) -> void:
 	var current_transform: Transform3D = camera_pivot.global_transform
 	var desired_transform: Transform3D = current_transform.looking_at(target_pos, Vector3.UP)
 	var blend: float = clamp(lock_camera_look_speed * delta, 0.0, 1.0)
-	current_transform.basis = current_transform.basis.slerp(desired_transform.basis, blend)
+	current_transform.basis = current_transform.basis.orthonormalized().slerp(desired_transform.basis.orthonormalized(), blend)
 	camera_pivot.global_transform = current_transform
 
 
