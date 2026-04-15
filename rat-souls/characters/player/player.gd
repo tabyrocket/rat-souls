@@ -122,6 +122,7 @@ func _update_timers(delta: float) -> void:
 		if parry_timer <= 0.0:
 			is_parrying = false
 			parry_timer = 0.0
+			visual_model.scale = Vector3.ONE
 			print("[Parry] Window ended.")
 
 	if dodge_cooldown_timer > 0.0:
@@ -414,7 +415,7 @@ func _try_start_parry() -> void:
 	stamina_time_since_consume = 0.0
 	is_attacking = false
 	attack_area.monitoring = false
-	visual_model.scale = Vector3.ONE
+	visual_model.scale = Vector3(1.4, 1.2, 0.6)
 	hit_bodies.clear()
 	is_dodging = false
 	is_parrying = true
@@ -569,6 +570,7 @@ func take_damage(amount, source) -> void:
 		# Exit parry state on successful deflect
 		is_parrying = false
 		parry_timer = 0.0
+		visual_model.scale = Vector3.ONE
 		print("[Parry] Player exited parry after successful deflect.")
 		return
 
