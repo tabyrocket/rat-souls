@@ -4,6 +4,7 @@ extends CharacterBody3D
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var camera_3d: Camera3D = $CameraPivot/Camera3D
 @onready var dodge_sfx: AudioStreamPlayer3D = $DodgeSFX
+@onready var footstep_sfx: AudioStreamPlayer3D = $FootstepSFX
 @onready var damaged_sfx: AudioStreamPlayer3D = $DamagedSFX
 @onready var visual_model: MeshInstance3D = $MeshInstance3D
 @onready var attack_area: Area3D = $AttackArea
@@ -64,6 +65,8 @@ var lock_target: Node3D = null
 var is_locked_on: bool = false
 var lock_switch_axis_ready: bool = true
 var lock_switch_mouse_accum_x: float = 0.0
+var footstep_timer: float = 0.0
+var was_walking: bool = false
 
 var is_hit: bool = false
 var hit_timer: float = 0.0
@@ -110,6 +113,7 @@ func _physics_process(delta: float) -> void:
 	_apply_gravity(delta)
 	_lock_rotation_constraints()
 	move_and_slide()
+	_update_footsteps(direction, delta)
 
 
 func _update_timers(delta: float) -> void:
@@ -488,6 +492,30 @@ func _update_horizontal_velocity(direction: Vector3, delta: float) -> void:
 	else:
 		velocity.x = 0.0
 		velocity.z = 0.0
+
+
+func _update_footsteps(direction: Vector3, delta: float) -> void:
+	var is_walking: bool = direction != Vector3.ZERO and is_on_floor() and not is_dodging and not is_hit and not is_parrying
+
+	if not is_walking:
+		was_walking = false
+		footstep_timer = 0.0
+		footstep_sfx.stop()
+		return
+
+	if not was_walking:
+		_play_random_footstep()
+		was_walking = true
+		return
+
+	footstep_timer -= delta
+	if footstep_timer <= 0.0:
+		_play_random_footstep()
+
+
+func _play_random_footstep() -> void:
+	footstep_sfx.play()
+	footstep_timer = randf_range(0.5, 0.7)
 
 
 func _apply_gravity(delta: float) -> void:

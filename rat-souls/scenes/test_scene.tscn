@@ -41,8 +41,9 @@ shadow_enabled = true
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1693026895]
 environment = SubResource("Environment_qjeyg")
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=711614748]
+[node name="BGM" type="AudioStreamPlayer" parent="." unique_id=711614748]
 stream = ExtResource("4_7ddre")
+volume_db = -80.0
 autoplay = true
 bus = &"BGM"
 

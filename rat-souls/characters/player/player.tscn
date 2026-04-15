@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://b77r6rskatnws" path="res://assets/images/rat.jpg" id="2_5dc8e"]
 [ext_resource type="AudioStream" uid="uid://cdxaqenhkkuvi" path="res://assets/sound/sfx/dash.mp3" id="2_xxgcw"]
 [ext_resource type="AudioStream" uid="uid://c72g7q7c1dovk" path="res://assets/sound/sfx/vine-boom.mp3" id="4_5dc8e"]
+[ext_resource type="AudioStream" uid="uid://u18dsnpuqm75" path="res://assets/sound/sfx/steps/Steps_floor-003.ogg" id="4_ixbpm"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6p3mc"]
 
@@ -17,7 +18,32 @@ size = Vector3(0.8, 0.8, 1.2)
 
 [node name="Player" type="CharacterBody3D" unique_id=1272587789 groups=["player"]]
 script = ExtResource("1_508ok")
+mouse_sensitivity = null
+controller_look_sensitivity = null
+min_look_angle_deg = null
+max_look_angle_deg = null
+lock_on_range = null
+lock_on_height_offset = null
+lock_rotation_speed = null
+lock_camera_look_speed = null
+lock_switch_stick_threshold = null
+lock_switch_release_threshold = null
+lock_switch_mouse_threshold = null
+speed = null
+player_model_rotation_speed = null
+dodge_speed = null
+dodge_duration = null
+dodge_cooldown = null
+attack_duration = null
 attack_cooldown = 1.0
+stamina_max = null
+stamina_attack_cost = null
+stamina_dodge_cost = null
+stamina_parry_cost = null
+stamina_regen_delay = null
+stamina_regen_rate = null
+parry_duration = null
+stun_duration = null
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1349732299]
 shape = SubResource("CapsuleShape3D_6p3mc")
@@ -34,6 +60,11 @@ transform = Transform3D(1, 0, 0, 0, 0.9659258, 0.25881904, 0, -0.25881904, 0.965
 
 [node name="DodgeSFX" type="AudioStreamPlayer3D" parent="." unique_id=1654719454]
 stream = ExtResource("2_xxgcw")
+bus = &"SFX"
+
+[node name="FootstepSFX" type="AudioStreamPlayer3D" parent="." unique_id=414971085]
+stream = ExtResource("4_ixbpm")
+volume_db = -5.0
 bus = &"SFX"
 
 [node name="DamagedSFX" type="AudioStreamPlayer3D" parent="." unique_id=1358051005]
