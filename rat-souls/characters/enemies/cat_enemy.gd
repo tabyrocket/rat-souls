@@ -47,7 +47,7 @@ var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 @onready var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
 @onready var attack_area: Area3D = $AttackArea
 @onready var separation_area: Area3D = $SeparationArea
-@onready var visual_model: MeshInstance3D = $MeshInstance3D
+@onready var visual_model: Node3D = $CatMesh
 @onready var damaged_sfx: AudioStreamPlayer3D = $DamagedSFX
 
 
@@ -123,7 +123,7 @@ func _state_attack(delta: float) -> void:
 
 	if attack_timer > attack_duration:
 		attack_area.monitoring = false
-		visual_model.scale = Vector3(1.2, 0.8, 1.2)
+		visual_model.scale = Vector3(0.6, 0.2, 0.6)
 	else:
 		attack_area.monitoring = true
 		_apply_attack_hits()
@@ -149,7 +149,7 @@ func _enter_attack_state() -> void:
 
 func _finish_attack_and_enter_cooldown() -> void:
 	attack_area.monitoring = false
-	visual_model.scale = Vector3.ONE
+	visual_model.scale = Vector3(0.4, 0.4, 0.4)
 	attack_timer = 0.0
 	state = State.COOLDOWN
 	cooldown_timer = attack_cooldown
@@ -159,7 +159,7 @@ func _finish_attack_and_enter_cooldown() -> void:
 
 func _reset_attack_runtime_state(reset_cooldown: bool = true) -> void:
 	attack_area.set_deferred("monitoring", false)
-	visual_model.scale = Vector3.ONE
+	visual_model.scale = Vector3(0.4, 0.4, 0.4)
 	attack_timer = 0.0
 	hit_bodies.clear()
 	if reset_cooldown:
