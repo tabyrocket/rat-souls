@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+const DAMAGE_NUMBER_FONT = preload("res://assets/fonts/Micro5-Regular.ttf")
+
 # Settings
 @export var health: int = 5
 @export var speed: float = 3.0
@@ -22,6 +24,10 @@ extends CharacterBody3D
 @export var separation_boundary_strafe_strength: float = 0.7
 @export var separation_strafe_interval: float = 0.5
 @export var separation_smoothing_speed: float = 10.0
+@export var damage_number_height: float = 1.45
+@export var damage_number_float_distance: float = 0.55
+@export var damage_number_lifetime: float = 0.8
+@export var damage_number_side_drift: float = 0.12
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
@@ -320,6 +326,107 @@ func _refresh_player_reference() -> void:
 	player = get_tree().get_first_node_in_group("player") as Node3D
 
 
+func _show_damage_number(amount: int) -> void:
+	if amount <= 0:
+		return
+	if not is_inside_tree():
+		return
+
+	var damage_label: Label3D = Label3D.new()
+	damage_label.text = str(amount)
+	damage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	damage_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	damage_label.fixed_size = true
+	damage_label.no_depth_test = true
+	damage_label.font = DAMAGE_NUMBER_FONT
+	damage_label.pixel_size = 0.003
+	damage_label.font_size = 60
+	damage_label.outline_size = 12
+	damage_label.outline_modulate = Color(0.05, 0.05, 0.09, 0.95)
+	damage_label.modulate = Color(1.0, 1.0, 1.0, 1.0)
+	if amount >= 2:
+		damage_label.outline_size = 10
+	damage_label.top_level = true
+	damage_label.scale = Vector3.ONE * (0.54 if amount >= 2 else 0.44)
+
+	var parent_for_label: Node = get_parent()
+	if parent_for_label == null:
+		parent_for_label = get_tree().current_scene
+	if parent_for_label == null:
+		parent_for_label = self
+	parent_for_label.add_child(damage_label)
+
+	var spawn_position: Vector3 = global_position + Vector3(
+		rng.randf_range(-0.24, 0.24),
+		damage_number_height + rng.randf_range(0.0, 0.12),
+		rng.randf_range(-0.16, 0.16)
+	)
+	damage_label.global_position = spawn_position
+
+	var tween: Tween = damage_label.create_tween()
+	var step_count: int = 3
+	var step_time: float = damage_number_lifetime / float(step_count)
+	var step_height: float = damage_number_float_distance / float(step_count)
+	var step_x: float = rng.randf_range(-damage_number_side_drift, damage_number_side_drift) / float(step_count)
+
+	tween.tween_property(
+		damage_label,
+		"scale",
+		Vector3.ONE * (0.62 if amount >= 2 else 0.5),
+		0.05
+	).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(
+		damage_label,
+		"modulate:a",
+		0.0,
+		damage_number_lifetime * 0.55
+	).set_delay(damage_number_lifetime * 0.45).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(
+		damage_label,
+		"outline_modulate:a",
+		0.0,
+		damage_number_lifetime * 0.55
+	).set_delay(damage_number_lifetime * 0.45).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
+
+	tween.tween_property(
+		damage_label,
+		"global_position:y",
+		damage_label.global_position.y + step_height,
+		step_time
+	).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(
+		damage_label,
+		"global_position:x",
+		damage_label.global_position.x + step_x,
+		step_time
+	).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
+	tween.tween_property(
+		damage_label,
+		"global_position:y",
+		damage_label.global_position.y + step_height * 2.0,
+		step_time
+	).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(
+		damage_label,
+		"global_position:x",
+		damage_label.global_position.x + step_x * 2.0,
+		step_time
+	).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
+	tween.tween_property(
+		damage_label,
+		"global_position:y",
+		damage_label.global_position.y + step_height * 3.0,
+		step_time
+	).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(
+		damage_label,
+		"global_position:x",
+		damage_label.global_position.x + step_x * 3.0,
+		step_time
+	).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN)
+	tween.finished.connect(damage_label.queue_free)
+
+
 func take_damage(amount, source) -> void:
 	if source == null or source == self or not source.is_in_group("player"):
 		return
@@ -331,6 +438,7 @@ func take_damage(amount, source) -> void:
 
 	var final_damage: int = int(max(round(float(amount) * damage_multiplier), 1.0))
 	health -= final_damage
+	_show_damage_number(final_damage)
 
 	damaged_sfx.play()
 	print("Cat hit! Base damage:", amount, "Final damage:", final_damage, "Health:", health)
