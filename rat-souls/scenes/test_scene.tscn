@@ -6,6 +6,7 @@
 [ext_resource type="AudioStream" uid="uid://coynmlws2v3om" path="res://assets/sound/bgm/challenge_music.mp3" id="4_7ddre"]
 [ext_resource type="PackedScene" uid="uid://dn2gm5k3ab7b1" path="res://characters/enemies/cat_enemy.tscn" id="5_qjeyg"]
 [ext_resource type="PackedScene" uid="uid://jnkio4dvpi3" path="res://ui/ui.tscn" id="6_3qnke"]
+[ext_resource type="PackedScene" uid="uid://dlseu03u7maj0" path="res://ui/psx_view.tscn" id="7_wtsjf"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7ddre"]
 albedo_texture = ExtResource("2_nd71p")
@@ -54,3 +55,5 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.07328606, 1.1250005, -17.3
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -15.115949, 1.1250005, -17.379742)
 
 [node name="UI" parent="." unique_id=855579192 instance=ExtResource("6_3qnke")]
+
+[node name="PSX_View" parent="." unique_id=771176161 instance=ExtResource("7_wtsjf")]

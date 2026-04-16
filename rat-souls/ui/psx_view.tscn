@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dlseu03u7maj0"]
+
+[ext_resource type="Shader" uid="uid://ce67pgji2gsbt" path="res://shaders/ps1_post_process.gdshader" id="1_nekbf"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_k5ug8"]
+shader = ExtResource("1_nekbf")
+
+[node name="PSX_View" type="CanvasLayer" unique_id=771176161]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=86215503]
+material = SubResource("ShaderMaterial_k5ug8")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
