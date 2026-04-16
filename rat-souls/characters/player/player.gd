@@ -6,7 +6,7 @@ extends CharacterBody3D
 @onready var dodge_sfx: AudioStreamPlayer3D = $DodgeSFX
 @onready var footstep_sfx: AudioStreamPlayer3D = $FootstepSFX
 @onready var damaged_sfx: AudioStreamPlayer3D = $DamagedSFX
-@onready var visual_model: MeshInstance3D = $MeshInstance3D
+@onready var visual_model: Node3D = $RatMesh
 @onready var attack_area: Area3D = $AttackArea
 
 # Camera tuning
@@ -122,7 +122,7 @@ func _update_timers(delta: float) -> void:
 		if parry_timer <= 0.0:
 			is_parrying = false
 			parry_timer = 0.0
-			visual_model.scale = Vector3.ONE
+			visual_model.scale = Vector3(0.6, 0.6, 0.6)
 			print("[Parry] Window ended.")
 
 	if dodge_cooldown_timer > 0.0:
@@ -393,7 +393,7 @@ func _try_start_attack() -> void:
 		attack_cooldown_timer = attack_cooldown
 		attack_area.monitoring = true
 		# Visual-only feedback: scale model, not the collision body.
-		visual_model.scale = Vector3(1.2, 0.8, 1.2)
+		visual_model.scale = Vector3(0.8, 0.4, 0.8)
 
 
 func _try_start_parry() -> void:
@@ -415,7 +415,7 @@ func _try_start_parry() -> void:
 	stamina_time_since_consume = 0.0
 	is_attacking = false
 	attack_area.monitoring = false
-	visual_model.scale = Vector3(1.4, 1.2, 0.6)
+	visual_model.scale = Vector3(1, 0.8, 0.2)
 	hit_bodies.clear()
 	is_dodging = false
 	is_parrying = true
@@ -429,7 +429,7 @@ func _update_attack(delta: float) -> void:
 	if is_attacking:
 		attack_timer -= delta
 		if attack_timer <= 0.0:
-			visual_model.scale = Vector3.ONE
+			visual_model.scale = Vector3(0.6, 0.6, 0.6)
 			is_attacking = false
 			attack_area.monitoring = false
 
@@ -570,7 +570,7 @@ func take_damage(amount, source) -> void:
 		# Exit parry state on successful deflect
 		is_parrying = false
 		parry_timer = 0.0
-		visual_model.scale = Vector3.ONE
+		visual_model.scale = Vector3(0.6, 0.6, 0.6)
 		print("[Parry] Player exited parry after successful deflect.")
 		return
 
@@ -580,7 +580,7 @@ func take_damage(amount, source) -> void:
 	
 	is_attacking = false
 	attack_area.monitoring = false
-	visual_model.scale = Vector3.ONE
+	visual_model.scale = Vector3(0.6, 0.6, 0.6)
 	is_dodging = false
 	is_hit = true
 	hit_timer = stun_duration
