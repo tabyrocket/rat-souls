@@ -36,7 +36,7 @@ material = SubResource("StandardMaterial3D_7ddre")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1509388158]
 transform = Transform3D(1, 0, 0, 0, -0.4183268, 0.90829664, 0, -0.90829664, -0.4183268, 0, 17.952576, 7.8374577)
 light_color = Color(1, 1, 0.7764706, 1)
-light_energy = 1.5
+light_energy = 1.2
 shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1693026895]
