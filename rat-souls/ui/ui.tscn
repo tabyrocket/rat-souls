@@ -5,6 +5,10 @@
 [ext_resource type="Texture2D" uid="uid://cejfdt4qiyodg" path="res://assets/images/ratpfp.png" id="3_wl5ax"]
 [ext_resource type="FontFile" uid="uid://qq8p6di1da4x" path="res://assets/fonts/Micro5-Regular.ttf" id="4_vkava"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_obcwv"]
+bg_color = Color(0, 0, 0, 0.4392157)
+corner_radius_top_left = 10
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ks8t7"]
 bg_color = Color(0.25552174, 2.6171097e-07, 1.2032688e-08, 1)
 corner_radius_top_right = 5
@@ -33,6 +37,38 @@ offset_right = 27.0
 offset_bottom = 27.0
 texture = ExtResource("1_nb4k0")
 expand_mode = 1
+
+[node name="ColorRect" type="Panel" parent="." unique_id=1988102307]
+custom_minimum_size = Vector2(150, 100)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -100.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_obcwv")
+
+[node name="ScoreLabel" type="Label" parent="ColorRect" unique_id=1669419319]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = -6.0
+offset_right = 5.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_vkava")
+theme_override_font_sizes/font_size = 111
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1353768931]
 custom_minimum_size = Vector2(300, 0)

@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+signal defeated(enemy: Node)
+
 const DAMAGE_NUMBER_FONT = preload("res://assets/fonts/Micro5-Regular.ttf")
 
 # Settings
@@ -57,6 +59,7 @@ var star_rotation_speed: float = 6.0
 var hit_flash_material: StandardMaterial3D
 var cat_mesh_instances: Array[MeshInstance3D] = []
 var hit_flash_request_id: int = 0
+var is_defeated: bool = false
 
 # References
 @onready var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
@@ -497,6 +500,9 @@ func _show_damage_number(amount: float) -> void:
 
 
 func take_damage(amount, source) -> void:
+	if is_defeated:
+		return
+
 	if source == null or source == self or not source.is_in_group("player"):
 		return
 
@@ -514,6 +520,8 @@ func take_damage(amount, source) -> void:
 	print("Cat hit! Base damage:", amount, "Final damage:", final_damage, "Health:", health)
 
 	if health <= 0:
+		is_defeated = true
+		emit_signal("defeated", self)
 		queue_free()
 		return
 
