@@ -1,6 +1,6 @@
 extends ProgressBar
 
-@export var world_offset: Vector3 = Vector3(0.0, 3.1, 0.0)
+@export var world_offset: Vector3 = Vector3(0.0, 2.1, 0.0)
 @export var smooth_speed: float = 8.0
 
 var enemy: Node3D = null
