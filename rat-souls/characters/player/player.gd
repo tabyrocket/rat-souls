@@ -35,6 +35,7 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 # Attack tuning
 @export var attack_duration: float = 0.2
 @export var attack_cooldown: float = 0.4
+@export var attack_damage: float = 1.0
 
 # Stamina tuning
 @export var stamina_max: float = 100.0
@@ -73,7 +74,7 @@ var hit_timer: float = 0.0
 @export var stun_duration: float = 1.0
 
 # Health
-var health = 5
+var health: float = 5.0
 
 
 func _ready() -> void:
@@ -534,7 +535,7 @@ func _lock_rotation_constraints() -> void:
 func _on_attack_area_body_entered(body: Node3D) -> void:
 	if is_attacking and body.has_method("take_damage") and not body in hit_bodies:
 		hit_bodies.append(body)
-		body.take_damage(1, self)
+		body.take_damage(attack_damage, self)
 
 
 func _face_attack_side_toward(target: Node3D) -> void:

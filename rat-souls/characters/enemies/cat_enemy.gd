@@ -6,10 +6,10 @@ const DAMAGE_NUMBER_FONT = preload("res://assets/fonts/Micro5-Regular.ttf")
 @export var mutation: float = 1.0
 const BASE_SCALE: Vector3 = Vector3(0.4, 0.4, 0.4)
 const WINDUP_SCALE: Vector3 = Vector3(0.6, 0.2, 0.6)
-@export var health: int = 5
+@export var health: float = 5.0
 @export var speed: float = 3.0
 @export var attack_range: float = 2.0
-@export var attack_damage: int = 1
+@export var attack_damage: float = 1.0
 @export var attack_windup: float = 0.6
 @export var attack_duration: float = 0.2
 @export var attack_cooldown: float = 1.0
@@ -31,6 +31,8 @@ const WINDUP_SCALE: Vector3 = Vector3(0.6, 0.2, 0.6)
 @export var damage_number_float_distance: float = 0.55
 @export var damage_number_lifetime: float = 0.8
 @export var damage_number_side_drift: float = 0.12
+@export var hit_flash_duration: float = 0.2
+@export var hit_flash_color: Color = Color(1.0, 0.18, 0.18, 1.0)
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
@@ -52,6 +54,9 @@ var boundary_strafe_timer: float = 0.0
 var smoothed_separation: Vector3 = Vector3.ZERO
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var star_rotation_speed: float = 6.0
+var hit_flash_material: StandardMaterial3D
+var cat_mesh_instances: Array[MeshInstance3D] = []
+var hit_flash_request_id: int = 0
 
 # References
 @onready var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
@@ -66,14 +71,67 @@ var star_rotation_speed: float = 6.0
 func _ready() -> void:
 	rng.seed = int(Time.get_ticks_usec()) + get_instance_id()
 	_refresh_chase_variation()
+	_cache_visual_mesh_instances()
+	_setup_hit_flash_material()
 
 	# Apply mutation to visual model scale and to health
 	if is_instance_valid(visual_model):
 		visual_model.scale = BASE_SCALE * mutation
-	health = max(1, int(round(float(health) * mutation)))
+	# Keep health as a float so fractional HP is preserved after mutation
+	health = max(1.0, float(health) * mutation)
+
+	# If this enemy has a child health bar, update its max/value to the
+	# mutated health so the bar reflects the post-mutation HP immediately.
+	var hb: Node = get_node_or_null("EnemyHealthBar")
+	if hb != null:
+		if hb.has_method("_apply_health_immediately"):
+			hb.health_max = float(health)
+			hb.shown_health = float(health)
+			hb.max_value = float(health)
+			hb.value = float(health)
+		else:
+			hb.max_value = float(health)
+			hb.value = float(health)
 
 	if is_instance_valid(star):
 		star.visible = false
+
+
+func _cache_visual_mesh_instances() -> void:
+	cat_mesh_instances.clear()
+	if not is_instance_valid(visual_model):
+		return
+
+	for node in visual_model.find_children("*", "MeshInstance3D", true, false):
+		if node is MeshInstance3D:
+			cat_mesh_instances.append(node as MeshInstance3D)
+
+
+func _setup_hit_flash_material() -> void:
+	hit_flash_material = StandardMaterial3D.new()
+	hit_flash_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	hit_flash_material.albedo_color = hit_flash_color
+	hit_flash_material.disable_receive_shadows = true
+
+
+func _trigger_hit_flash() -> void:
+	if cat_mesh_instances.is_empty() or hit_flash_duration <= 0.0:
+		return
+
+	hit_flash_request_id += 1
+	var request_id: int = hit_flash_request_id
+
+	for mesh_instance in cat_mesh_instances:
+		if is_instance_valid(mesh_instance):
+			mesh_instance.material_overlay = hit_flash_material
+
+	await get_tree().create_timer(hit_flash_duration).timeout
+	if request_id != hit_flash_request_id:
+		return
+
+	for mesh_instance in cat_mesh_instances:
+		if is_instance_valid(mesh_instance):
+			mesh_instance.material_overlay = null
 
 
 func _physics_process(delta: float) -> void:
@@ -335,14 +393,16 @@ func _refresh_player_reference() -> void:
 	player = get_tree().get_first_node_in_group("player") as Node3D
 
 
-func _show_damage_number(amount: int) -> void:
-	if amount <= 0:
+func _show_damage_number(amount: float) -> void:
+	# Round to nearest integer for display, and skip zero/negative results.
+	var display_amount: int = int(round(float(amount)))
+	if display_amount <= 0:
 		return
 	if not is_inside_tree():
 		return
 
 	var damage_label: Label3D = Label3D.new()
-	damage_label.text = str(amount)
+	damage_label.text = str(display_amount)
 	damage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	damage_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	damage_label.fixed_size = true
@@ -353,10 +413,10 @@ func _show_damage_number(amount: int) -> void:
 	damage_label.outline_size = 12
 	damage_label.outline_modulate = Color(0.05, 0.05, 0.09, 0.95)
 	damage_label.modulate = Color(1.0, 1.0, 1.0, 1.0)
-	if amount >= 2:
+	if display_amount >= 2:
 		damage_label.outline_size = 10
 	damage_label.top_level = true
-	damage_label.scale = Vector3.ONE * (0.54 if amount >= 2 else 0.44)
+	damage_label.scale = Vector3.ONE * (0.54 if display_amount >= 2 else 0.44)
 
 	var parent_for_label: Node = get_parent()
 	if parent_for_label == null:
@@ -381,7 +441,7 @@ func _show_damage_number(amount: int) -> void:
 	tween.tween_property(
 		damage_label,
 		"scale",
-		Vector3.ONE * (0.62 if amount >= 2 else 0.5),
+		Vector3.ONE * (0.62 if display_amount >= 2 else 0.5),
 		0.05
 	).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(
@@ -444,10 +504,11 @@ func take_damage(amount, source) -> void:
 	if state == State.STUNNED:
 		damage_multiplier = stunned_damage_multiplier
 		print("Cat is stunned. Applying damage multiplier:", stunned_damage_multiplier)
-
-	var final_damage: int = int(max(round(float(amount) * damage_multiplier), 1.0))
+	# Use floating-point damage so fractional damage is preserved.
+	var final_damage: float = max(0.0, float(amount) * damage_multiplier)
 	health -= final_damage
 	_show_damage_number(final_damage)
+	_trigger_hit_flash()
 
 	damaged_sfx.play()
 	print("Cat hit! Base damage:", amount, "Final damage:", final_damage, "Health:", health)
@@ -502,18 +563,26 @@ func apply_parry_stun(duration: float = -1.0) -> void:
 	print("Cat parry-stunned for", parry_stun_timer, "seconds. Knockback:", velocity)
 
 
+func _get_scaled_attack_damage() -> float:
+	# Return a floating-point attack damage scaled by mutation.
+	# Allow fractional damage (don't round to int).
+	return max(0.0, float(attack_damage) * mutation)
+
+
 func _on_attack_area_body_entered(body: Node) -> void:
 	if not _is_attack_hit_window_active():
 		return
 	if body.has_method("take_damage") and not body in hit_bodies:
 		hit_bodies.append(body)
-		body.take_damage(attack_damage, self)
+		var dmg: float = _get_scaled_attack_damage()
+		body.take_damage(dmg, self)
 
 
 func _apply_attack_hits() -> void:
 	if not _is_attack_hit_window_active():
 		return
+	var dmg: float = _get_scaled_attack_damage()
 	for body in attack_area.get_overlapping_bodies():
 		if body.has_method("take_damage") and not body in hit_bodies:
 			hit_bodies.append(body)
-			body.take_damage(attack_damage, self)
+			body.take_damage(dmg, self)
