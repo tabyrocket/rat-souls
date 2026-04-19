@@ -53,6 +53,7 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.07328606, 1.1250005, -17.3
 
 [node name="CatEnemy2" parent="." unique_id=511084164 instance=ExtResource("5_qjeyg")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -15.115949, 1.1250005, -17.379742)
+mutation = 0.5
 
 [node name="UI" parent="." unique_id=855579192 instance=ExtResource("6_3qnke")]
 

@@ -3,6 +3,9 @@ extends CharacterBody3D
 const DAMAGE_NUMBER_FONT = preload("res://assets/fonts/Micro5-Regular.ttf")
 
 # Settings
+@export var mutation: float = 1.0
+const BASE_SCALE: Vector3 = Vector3(0.4, 0.4, 0.4)
+const WINDUP_SCALE: Vector3 = Vector3(0.6, 0.2, 0.6)
 @export var health: int = 5
 @export var speed: float = 3.0
 @export var attack_range: float = 2.0
@@ -63,6 +66,12 @@ var star_rotation_speed: float = 6.0
 func _ready() -> void:
 	rng.seed = int(Time.get_ticks_usec()) + get_instance_id()
 	_refresh_chase_variation()
+
+	# Apply mutation to visual model scale and to health
+	if is_instance_valid(visual_model):
+		visual_model.scale = BASE_SCALE * mutation
+	health = max(1, int(round(float(health) * mutation)))
+
 	if is_instance_valid(star):
 		star.visible = false
 
@@ -141,7 +150,7 @@ func _state_attack(delta: float) -> void:
 
 	if attack_timer > attack_duration:
 		attack_area.monitoring = false
-		visual_model.scale = Vector3(0.6, 0.2, 0.6)
+		visual_model.scale = WINDUP_SCALE * mutation
 	else:
 		attack_area.monitoring = true
 		_apply_attack_hits()
@@ -167,7 +176,7 @@ func _enter_attack_state() -> void:
 
 func _finish_attack_and_enter_cooldown() -> void:
 	attack_area.monitoring = false
-	visual_model.scale = Vector3(0.4, 0.4, 0.4)
+	visual_model.scale = BASE_SCALE * mutation
 	attack_timer = 0.0
 	state = State.COOLDOWN
 	cooldown_timer = attack_cooldown
@@ -177,7 +186,7 @@ func _finish_attack_and_enter_cooldown() -> void:
 
 func _reset_attack_runtime_state(reset_cooldown: bool = true) -> void:
 	attack_area.set_deferred("monitoring", false)
-	visual_model.scale = Vector3(0.4, 0.4, 0.4)
+	visual_model.scale = BASE_SCALE * mutation
 	attack_timer = 0.0
 	hit_bodies.clear()
 	if reset_cooldown:

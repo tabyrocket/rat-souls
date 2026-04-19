@@ -68,6 +68,7 @@ value = 100.0
 show_percentage = false
 
 [node name="PausePanel" type="ColorRect" parent="." unique_id=1708188956]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -124,6 +125,7 @@ theme_override_font_sizes/font_size = 32
 text = "Main Menu"
 
 [node name="SettingsPanel" type="ColorRect" parent="." unique_id=593864363]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
