@@ -1,5 +1,7 @@
 extends Node
 
+signal score_changed(new_score: int)
+
 @export var points_per_enemy_kill: int = 1
 @export var score_label_path: NodePath = NodePath("../UI/ColorRect/ScoreLabel")
 
@@ -10,6 +12,7 @@ var score_label: Label = null
 func _ready() -> void:
 	score_label = get_node_or_null(score_label_path) as Label
 	_update_score_label()
+	emit_signal("score_changed", score)
 	_connect_existing_enemies()
 
 	if not get_tree().node_added.is_connected(_on_tree_node_added):
@@ -40,9 +43,14 @@ func _connect_enemy_if_supported(enemy: Node) -> void:
 func _on_enemy_defeated(_enemy: Node) -> void:
 	score += points_per_enemy_kill
 	_update_score_label()
+	emit_signal("score_changed", score)
 
 
 func _update_score_label() -> void:
 	if score_label == null:
 		return
 	score_label.text = str(score)
+
+
+func get_score() -> int:
+	return score

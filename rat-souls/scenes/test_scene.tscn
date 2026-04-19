@@ -5,9 +5,9 @@
 [ext_resource type="Texture2D" uid="uid://dk7pyoxf07ucc" path="res://icon.svg" id="2_nd71p"]
 [ext_resource type="AudioStream" uid="uid://coynmlws2v3om" path="res://assets/sound/bgm/challenge_music.mp3" id="4_7ddre"]
 [ext_resource type="Script" uid="uid://ba76xfok4c48a" path="res://scenes/game_manager.gd" id="4_rnaij"]
-[ext_resource type="PackedScene" uid="uid://dn2gm5k3ab7b1" path="res://characters/enemies/cat_enemy.tscn" id="5_qjeyg"]
 [ext_resource type="PackedScene" uid="uid://jnkio4dvpi3" path="res://ui/ui.tscn" id="6_3qnke"]
 [ext_resource type="PackedScene" uid="uid://dlseu03u7maj0" path="res://ui/psx_view.tscn" id="7_wtsjf"]
+[ext_resource type="Script" uid="uid://r6oj6j5slrxy" path="res://scenes/enemy_spawner.gd" id="8_spawner"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7ddre"]
 albedo_texture = ExtResource("2_nd71p")
@@ -46,19 +46,14 @@ environment = SubResource("Environment_qjeyg")
 [node name="GameManager" type="Node" parent="." unique_id=257461485]
 script = ExtResource("4_rnaij")
 
+[node name="EnemySpawner" type="Node" parent="." unique_id=2112717369]
+script = ExtResource("8_spawner")
+
 [node name="BGM" type="AudioStreamPlayer" parent="." unique_id=711614748]
 stream = ExtResource("4_7ddre")
 volume_db = -80.0
 autoplay = true
 bus = &"BGM"
-
-[node name="CatEnemy" parent="." unique_id=1927594226 instance=ExtResource("5_qjeyg")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.07328606, 1.1250005, -17.379742)
-mutation = 0.5
-
-[node name="CatEnemy2" parent="." unique_id=511084164 instance=ExtResource("5_qjeyg")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -15.115949, 1.1250005, -17.379742)
-mutation = 2.0
 
 [node name="UI" parent="." unique_id=855579192 instance=ExtResource("6_3qnke")]
 
