@@ -184,8 +184,8 @@ func _physics_process(delta: float) -> void:
 func _state_hit(delta: float) -> void:
 	hit_timer -= delta
 	if is_on_floor():
-		velocity.x = move_toward(velocity.x, 0.0, speed * 2.0 * delta)
-		velocity.z = move_toward(velocity.z, 0.0, speed * 2.0 * delta)
+		velocity.x = move_toward(velocity.x, 0.0, _get_effective_speed() * 2.0 * delta)
+		velocity.z = move_toward(velocity.z, 0.0, _get_effective_speed() * 2.0 * delta)
 
 	if hit_timer <= 0.0:
 		state = State.ORBIT
@@ -217,14 +217,14 @@ func _state_orbit(delta: float, direction_to_player: Vector3, distance_to_player
 		return
 
 	if direction_to_player == Vector3.ZERO:
-		velocity.x = move_toward(velocity.x, 0.0, speed * delta)
-		velocity.z = move_toward(velocity.z, 0.0, speed * delta)
+		velocity.x = move_toward(velocity.x, 0.0, _get_effective_speed() * delta)
+		velocity.z = move_toward(velocity.z, 0.0, _get_effective_speed() * delta)
 		return
 
 	var move_direction: Vector3 = _compute_orbit_move_direction(delta, direction_to_player, distance_to_player)
-	var target_speed: float = speed * flank_speed_multiplier
+	var target_speed: float = _get_effective_speed() * flank_speed_multiplier
 	if distance_to_player > _get_target_orbit_radius() + orbit_approach_band:
-		target_speed = speed * approach_speed_multiplier
+		target_speed = _get_effective_speed() * approach_speed_multiplier
 
 	velocity.x = move_direction.x * target_speed
 	velocity.z = move_direction.z * target_speed
@@ -262,12 +262,12 @@ func _state_cooldown(delta: float, direction_to_player: Vector3, distance_to_pla
 
 	if direction_to_player != Vector3.ZERO:
 		var move_direction: Vector3 = _compute_orbit_move_direction(delta, direction_to_player, distance_to_player)
-		velocity.x = move_direction.x * speed * cooldown_speed_multiplier
-		velocity.z = move_direction.z * speed * cooldown_speed_multiplier
+		velocity.x = move_direction.x * _get_effective_speed() * cooldown_speed_multiplier
+		velocity.z = move_direction.z * _get_effective_speed() * cooldown_speed_multiplier
 		_face_move_direction(move_direction, distance_to_player)
 	else:
-		velocity.x = move_toward(velocity.x, 0.0, speed * delta)
-		velocity.z = move_toward(velocity.z, 0.0, speed * delta)
+		velocity.x = move_toward(velocity.x, 0.0, _get_effective_speed() * delta)
+		velocity.z = move_toward(velocity.z, 0.0, _get_effective_speed() * delta)
 
 	if cooldown_timer <= 0.0:
 		state = State.ORBIT
@@ -858,6 +858,12 @@ func apply_parry_stun(duration: float = -1.0) -> void:
 
 func _get_scaled_attack_damage() -> float:
 	return max(0.0, float(attack_damage) * mutation)
+
+
+func _get_effective_speed() -> float:
+	# Higher mutation => lower effective speed. Protect against zero.
+	var safe_mutation: float = max(0.0001, float(mutation))
+	return float(speed) / safe_mutation
 
 
 func _on_attack_area_body_entered(body: Node) -> void:
