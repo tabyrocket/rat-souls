@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+const COMBAT_VISUAL_FEEDBACK = preload("res://characters/shared/combat_visual_feedback.gd")
+
 # Node references
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var camera_3d: Camera3D = $CameraPivot/Camera3D
@@ -8,6 +10,7 @@ extends CharacterBody3D
 @onready var damaged_sfx: AudioStreamPlayer3D = $DamagedSFX
 @onready var visual_model: Node3D = $RatMesh
 @onready var attack_area: Area3D = $AttackArea
+@onready var star: Node3D = get_node_or_null("Star") as Node3D
 
 # Camera tuning
 @export var mouse_sensitivity: float = 0.002
@@ -35,7 +38,7 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 # Attack tuning
 @export var attack_duration: float = 0.2
 @export var attack_cooldown: float = 0.4
-@export var attack_damage: float = 1.0
+@export var attack_damage: float = 2.0
 
 # Stamina tuning
 @export var stamina_max: float = 100.0
@@ -47,6 +50,11 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # Parry tuning
 @export var parry_duration: float = 1.0
+
+# Damage feedback
+@export_group("Damage Feedback")
+@export var hit_flash_duration: float = 0.2
+@export var hit_flash_color: Color = Color(1.0, 0.18, 0.18, 1.0)
 
 # Runtime state
 var camera_offset: Vector3
@@ -68,6 +76,8 @@ var lock_switch_axis_ready: bool = true
 var lock_switch_mouse_accum_x: float = 0.0
 var footstep_timer: float = 0.0
 var was_walking: bool = false
+var star_rotation_speed: float = 6.0
+var combat_visual_feedback
 
 var is_hit: bool = false
 var hit_timer: float = 0.0
@@ -82,6 +92,10 @@ func _ready() -> void:
 	camera_offset = camera_pivot.position
 	camera_pivot.top_level = true
 	stamina = stamina_max
+	combat_visual_feedback = COMBAT_VISUAL_FEEDBACK.new(self, visual_model, star)
+	combat_visual_feedback.configure_hit_flash(hit_flash_duration, hit_flash_color)
+	combat_visual_feedback.configure_star_rotation_speed(star_rotation_speed)
+	combat_visual_feedback.hide_star()
 
 
 func _input(event: InputEvent) -> void:
@@ -463,6 +477,9 @@ func _get_idle_dodge_direction() -> Vector3:
 
 func _update_horizontal_velocity(direction: Vector3, delta: float) -> void:
 	if is_hit:
+		if combat_visual_feedback != null:
+			combat_visual_feedback.show_and_spin_star(delta)
+
 		hit_timer -= delta
 		if is_on_floor():
 			velocity.x = move_toward(velocity.x, 0, speed * 2 * delta)
@@ -470,6 +487,8 @@ func _update_horizontal_velocity(direction: Vector3, delta: float) -> void:
 		
 		if hit_timer <= 0.0:
 			is_hit = false
+			if combat_visual_feedback != null:
+				combat_visual_feedback.hide_star()
 	elif is_parrying:
 		velocity.x = 0.0
 		velocity.z = 0.0
@@ -538,6 +557,11 @@ func _on_attack_area_body_entered(body: Node3D) -> void:
 		body.take_damage(attack_damage, self)
 
 
+func _trigger_hit_flash() -> void:
+	if combat_visual_feedback != null:
+		combat_visual_feedback.trigger_hit_flash()
+
+
 func _face_attack_side_toward(target: Node3D) -> void:
 	var to_target: Vector3 = target.global_position - global_position
 	to_target.y = 0.0
@@ -576,6 +600,7 @@ func take_damage(amount, source) -> void:
 		return
 
 	health -= amount
+	_trigger_hit_flash()
 	damaged_sfx.play()
 	print("Player hit! Health:", health)
 	
@@ -589,4 +614,6 @@ func take_damage(amount, source) -> void:
 	velocity.y = 1.5
 	
 	if health <= 0:
+		if combat_visual_feedback != null:
+			combat_visual_feedback.hide_star()
 		print("Player died")

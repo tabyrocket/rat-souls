@@ -3,6 +3,7 @@ extends CharacterBody3D
 signal defeated(enemy: Node)
 
 const DAMAGE_NUMBER_FONT = preload("res://assets/fonts/Micro5-Regular.ttf")
+const COMBAT_VISUAL_FEEDBACK = preload("res://characters/shared/combat_visual_feedback.gd")
 
 # Base combat settings
 @export var mutation: float = 1.0
@@ -98,9 +99,7 @@ var registry_maintenance_timer: float = 0.0
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var star_rotation_speed: float = 6.0
-var hit_flash_material: StandardMaterial3D
-var cat_mesh_instances: Array[MeshInstance3D] = []
-var hit_flash_request_id: int = 0
+var combat_visual_feedback
 var is_defeated: bool = false
 
 # References
@@ -119,8 +118,10 @@ func _ready() -> void:
 	_cleanup_static_pack()
 	_configure_separation_sensor()
 	_initialize_orbit_profile()
-	_cache_visual_mesh_instances()
-	_setup_hit_flash_material()
+	combat_visual_feedback = COMBAT_VISUAL_FEEDBACK.new(self, visual_model, star)
+	combat_visual_feedback.configure_hit_flash(hit_flash_duration, hit_flash_color)
+	combat_visual_feedback.configure_star_rotation_speed(star_rotation_speed)
+	combat_visual_feedback.hide_star()
 
 	if is_instance_valid(visual_model):
 		visual_model.scale = BASE_SCALE * mutation
@@ -137,10 +138,6 @@ func _ready() -> void:
 		else:
 			hb.max_value = float(health)
 			hb.value = float(health)
-
-	if is_instance_valid(star):
-		star.visible = false
-
 
 func _exit_tree() -> void:
 	_release_attack_claim()
@@ -196,14 +193,12 @@ func _state_stunned(delta: float) -> void:
 	velocity.x = 0.0
 	velocity.z = 0.0
 
-	if is_instance_valid(star):
-		star.visible = true
-		star.rotate_y(star_rotation_speed * delta)
+	if combat_visual_feedback != null:
+		combat_visual_feedback.show_and_spin_star(delta)
 
 	if parry_stun_timer <= 0.0:
-		if is_instance_valid(star):
-			star.visible = false
-			star.rotation = Vector3.ZERO
+		if combat_visual_feedback != null:
+			combat_visual_feedback.hide_star()
 		_reset_attack_runtime_state()
 		parry_stun_timer = 0.0
 		state = State.ORBIT
@@ -609,41 +604,9 @@ func _configure_separation_sensor() -> void:
 		sphere.radius = max(separation_detection_radius, separation_soft_radius + 0.4)
 
 
-func _cache_visual_mesh_instances() -> void:
-	cat_mesh_instances.clear()
-	if not is_instance_valid(visual_model):
-		return
-
-	for node in visual_model.find_children("*", "MeshInstance3D", true, false):
-		if node is MeshInstance3D:
-			cat_mesh_instances.append(node as MeshInstance3D)
-
-
-func _setup_hit_flash_material() -> void:
-	hit_flash_material = StandardMaterial3D.new()
-	hit_flash_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	hit_flash_material.albedo_color = hit_flash_color
-	hit_flash_material.disable_receive_shadows = true
-
-
 func _trigger_hit_flash() -> void:
-	if cat_mesh_instances.is_empty() or hit_flash_duration <= 0.0:
-		return
-
-	hit_flash_request_id += 1
-	var request_id: int = hit_flash_request_id
-
-	for mesh_instance in cat_mesh_instances:
-		if is_instance_valid(mesh_instance):
-			mesh_instance.material_overlay = hit_flash_material
-
-	await get_tree().create_timer(hit_flash_duration).timeout
-	if request_id != hit_flash_request_id:
-		return
-
-	for mesh_instance in cat_mesh_instances:
-		if is_instance_valid(mesh_instance):
-			mesh_instance.material_overlay = null
+	if combat_visual_feedback != null:
+		combat_visual_feedback.trigger_hit_flash()
 
 
 func _apply_gravity(delta: float) -> void:
@@ -813,9 +776,8 @@ func take_damage(amount, source) -> void:
 		return
 
 	if state == State.STUNNED:
-		if is_instance_valid(star):
-			star.visible = false
-			star.rotation = Vector3.ZERO
+		if combat_visual_feedback != null:
+			combat_visual_feedback.hide_star()
 		parry_stun_timer = 0.0
 		_reset_attack_runtime_state()
 		state = State.HIT
@@ -851,9 +813,8 @@ func apply_parry_stun(duration: float = -1.0) -> void:
 	parry_stun_timer = resolved_duration
 	gong_sfx.play()
 
-	if is_instance_valid(star):
-		star.rotation = Vector3.ZERO
-		star.visible = true
+	if combat_visual_feedback != null:
+		combat_visual_feedback.show_star(true)
 
 
 func _get_scaled_attack_damage() -> float:
