@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="rat-souls"
-run/main_scene="uid://dmkp2dicjnoit"
+run/main_scene="uid://bhrkujncagqvj"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 

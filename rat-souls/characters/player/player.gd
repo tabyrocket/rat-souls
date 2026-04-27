@@ -58,6 +58,11 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @export var hit_flash_duration: float = 0.2
 @export var hit_flash_color: Color = Color(1.0, 0.18, 0.18, 1.0)
 
+# Startup safety window to avoid scene-transition input/physics carryover.
+@export_group("Startup")
+@export var startup_physics_freeze_duration: float = 0.12
+@export var startup_action_block_duration: float = 0.2
+
 # Runtime state
 var camera_offset: Vector3
 var stamina: float = 100.0
@@ -93,22 +98,29 @@ var health: float = 5.0
 var is_dead: bool = false
 var death_timer: float = 0.0
 var death_ui_shown: bool = false
+var startup_physics_freeze_timer: float = 0.0
+var startup_action_block_timer: float = 0.0
 
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	camera_offset = camera_pivot.position
 	camera_pivot.top_level = true
+	startup_physics_freeze_timer = max(startup_physics_freeze_duration, 0.0)
+	startup_action_block_timer = max(startup_action_block_duration, startup_physics_freeze_timer)
 	stamina = stamina_max
 	combat_visual_feedback = COMBAT_VISUAL_FEEDBACK.new(self, visual_model, star)
 	combat_visual_feedback.configure_hit_flash(hit_flash_duration, hit_flash_color)
 	combat_visual_feedback.configure_star_rotation_speed(star_rotation_speed)
 	combat_visual_feedback.hide_star()
+	Input.flush_buffered_events()
 	_play_rig_animation("Idle")
 
 
 func _input(event: InputEvent) -> void:
 	if is_dead:
+		return
+	if _is_startup_actions_blocked():
 		return
 	if event is InputEventMouseMotion:
 		if is_parrying:
@@ -123,6 +135,16 @@ func _input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	if is_dead:
 		_update_death(delta)
+		_lock_rotation_constraints()
+		return
+
+	if startup_action_block_timer > 0.0:
+		startup_action_block_timer = max(startup_action_block_timer - delta, 0.0)
+
+	if startup_physics_freeze_timer > 0.0:
+		startup_physics_freeze_timer = max(startup_physics_freeze_timer - delta, 0.0)
+		velocity = Vector3.ZERO
+		_update_camera_follow()
 		_lock_rotation_constraints()
 		return
 
@@ -225,7 +247,13 @@ func _update_camera_follow() -> void:
 	camera_pivot.global_position = global_position + camera_offset
 
 
+func _is_startup_actions_blocked() -> bool:
+	return startup_action_block_timer > 0.0
+
+
 func _handle_lock_on_toggle() -> void:
+	if _is_startup_actions_blocked():
+		return
 	if not Input.is_action_just_pressed("lock_on"):
 		return
 
@@ -466,6 +494,8 @@ func _get_lock_forward_direction() -> Vector3:
 func _try_start_attack() -> void:
 	if is_dead:
 		return
+	if _is_startup_actions_blocked():
+		return
 	if is_hit or is_parrying:
 		return
 	if Input.is_action_just_pressed("attack") and attack_cooldown_timer <= 0.0 and not is_attacking and not is_attack_winding_up:
@@ -485,6 +515,8 @@ func _try_start_attack() -> void:
 
 func _try_start_parry() -> void:
 	if is_dead:
+		return
+	if _is_startup_actions_blocked():
 		return
 	if is_hit or is_parrying:
 		return
@@ -535,6 +567,8 @@ func _update_attack(delta: float) -> void:
 
 func _try_start_dodge(direction: Vector3) -> void:
 	if is_dead:
+		return
+	if _is_startup_actions_blocked():
 		return
 	if is_hit or is_parrying:
 		return
