@@ -8,7 +8,8 @@ const COMBAT_VISUAL_FEEDBACK = preload("res://characters/shared/combat_visual_fe
 @onready var dodge_sfx: AudioStreamPlayer3D = $DodgeSFX
 @onready var footstep_sfx: AudioStreamPlayer3D = $FootstepSFX
 @onready var damaged_sfx: AudioStreamPlayer3D = $DamagedSFX
-@onready var visual_model: Node3D = $RatMesh
+@onready var visual_model: Node3D = $RatRig
+@onready var rat_rig_animation_player: AnimationPlayer = get_node_or_null("RatRig/AnimationPlayer") as AnimationPlayer
 @onready var attack_area: Area3D = $AttackArea
 @onready var star: Node3D = get_node_or_null("Star") as Node3D
 
@@ -36,6 +37,7 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @export var dodge_cooldown: float = 0.60
 
 # Attack tuning
+@export var attack_windup_duration: float = 0.4
 @export var attack_duration: float = 0.2
 @export var attack_cooldown: float = 0.4
 @export var attack_damage: float = 2.0
@@ -65,6 +67,8 @@ var dodge_timer: float = 0.0
 var dodge_cooldown_timer: float = 0.0
 var dodge_direction: Vector3 = Vector3.ZERO
 var is_attacking: bool = false
+var is_attack_winding_up: bool = false
+var attack_windup_timer: float = 0.0
 var attack_timer: float = 0.0
 var attack_cooldown_timer: float = 0.0
 var is_parrying: bool = false
@@ -96,6 +100,7 @@ func _ready() -> void:
 	combat_visual_feedback.configure_hit_flash(hit_flash_duration, hit_flash_color)
 	combat_visual_feedback.configure_star_rotation_speed(star_rotation_speed)
 	combat_visual_feedback.hide_star()
+	_play_rig_animation("Idle")
 
 
 func _input(event: InputEvent) -> void:
@@ -124,11 +129,42 @@ func _physics_process(delta: float) -> void:
 	_try_start_dodge(direction)
 	_update_horizontal_velocity(direction, delta)
 	_update_lock_on_orientation(delta)
+	_update_rig_animation(direction)
 
 	_apply_gravity(delta)
 	_lock_rotation_constraints()
 	move_and_slide()
 	_update_footsteps(direction, delta)
+
+
+func _play_rig_animation(animation_name: StringName) -> void:
+	if rat_rig_animation_player == null:
+		return
+	if rat_rig_animation_player.current_animation == animation_name and rat_rig_animation_player.is_playing():
+		return
+	if rat_rig_animation_player.has_animation(animation_name):
+		rat_rig_animation_player.play(animation_name)
+
+
+func _update_rig_animation(direction: Vector3) -> void:
+	if is_attack_winding_up or is_attacking:
+		_play_rig_animation("Attack")
+		return
+	if is_dodging:
+		_play_rig_animation("Roll")
+		return
+	if is_parrying:
+		_play_rig_animation("Parry")
+		return
+	if is_hit:
+		_play_rig_animation("Stun")
+		return
+
+	var is_walking: bool = direction != Vector3.ZERO and is_on_floor()
+	if is_walking:
+		_play_rig_animation("Walk")
+	else:
+		_play_rig_animation("Idle")
 
 
 func _update_timers(delta: float) -> void:
@@ -395,7 +431,7 @@ func _get_lock_forward_direction() -> Vector3:
 func _try_start_attack() -> void:
 	if is_hit or is_parrying:
 		return
-	if Input.is_action_just_pressed("attack") and attack_cooldown_timer <= 0.0 and not is_attacking:
+	if Input.is_action_just_pressed("attack") and attack_cooldown_timer <= 0.0 and not is_attacking and not is_attack_winding_up:
 		# Require enough stamina to perform attack.
 		if stamina < stamina_attack_cost:
 			print("[Attack] Not enough stamina. Required:", stamina_attack_cost, "Current:", stamina)
@@ -403,10 +439,9 @@ func _try_start_attack() -> void:
 		stamina = max(stamina - stamina_attack_cost, 0.0)
 		stamina_time_since_consume = 0.0
 		hit_bodies.clear()
-		is_attacking = true
-		attack_timer = attack_duration
+		is_attack_winding_up = true
+		attack_windup_timer = attack_windup_duration
 		attack_cooldown_timer = attack_cooldown
-		attack_area.monitoring = true
 		# Visual-only feedback: scale model, not the collision body.
 		visual_model.scale = Vector3(0.8, 0.4, 0.8)
 
@@ -421,13 +456,15 @@ func _try_start_parry() -> void:
 		print("[Parry] Not enough stamina. Required:", stamina_parry_cost, "Current:", stamina)
 		return
 
-	if is_attacking:
+	if is_attacking or is_attack_winding_up:
 		print("[Parry] Canceling active attack for parry.")
 	if is_dodging:
 		print("[Parry] Canceling active dodge for parry.")
 
 	stamina = max(stamina - stamina_parry_cost, 0.0)
 	stamina_time_since_consume = 0.0
+	is_attack_winding_up = false
+	attack_windup_timer = 0.0
 	is_attacking = false
 	attack_area.monitoring = false
 	visual_model.scale = Vector3(1, 0.8, 0.2)
@@ -441,6 +478,14 @@ func _try_start_parry() -> void:
 
 
 func _update_attack(delta: float) -> void:
+	if is_attack_winding_up:
+		attack_windup_timer -= delta
+		if attack_windup_timer <= 0.0:
+			is_attack_winding_up = false
+			is_attacking = true
+			attack_timer = attack_duration
+			attack_area.monitoring = true
+
 	if is_attacking:
 		attack_timer -= delta
 		if attack_timer <= 0.0:
@@ -452,7 +497,7 @@ func _update_attack(delta: float) -> void:
 func _try_start_dodge(direction: Vector3) -> void:
 	if is_hit or is_parrying:
 		return
-	if Input.is_action_just_pressed("dodge") and dodge_cooldown_timer <= 0.0 and not is_dodging:
+	if Input.is_action_just_pressed("dodge") and dodge_cooldown_timer <= 0.0 and not is_dodging and not is_attack_winding_up and not is_attacking:
 		# Require enough stamina to dodge.
 		if stamina < stamina_dodge_cost:
 			print("[Dodge] Not enough stamina. Required:", stamina_dodge_cost, "Current:", stamina)
@@ -605,6 +650,8 @@ func take_damage(amount, source) -> void:
 	print("Player hit! Health:", health)
 	
 	is_attacking = false
+	is_attack_winding_up = false
+	attack_windup_timer = 0.0
 	attack_area.monitoring = false
 	visual_model.scale = Vector3(0.6, 0.6, 0.6)
 	is_dodging = false
