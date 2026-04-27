@@ -4,6 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://h5pjijcmj8xc" path="res://assets/images/x.png" id="1_nb4k0"]
 [ext_resource type="Texture2D" uid="uid://cejfdt4qiyodg" path="res://assets/images/ratpfp.png" id="3_wl5ax"]
 [ext_resource type="FontFile" uid="uid://qq8p6di1da4x" path="res://assets/fonts/Micro5-Regular.ttf" id="4_vkava"]
+[ext_resource type="Texture2D" uid="uid://k5tatk0qfc0i" path="res://assets/images/sadhamp1.png" id="5_obcwv"]
+[ext_resource type="Texture2D" uid="uid://dqhin23trg4km" path="res://assets/images/sadhamp2.png" id="6_bo1jx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_obcwv"]
 bg_color = Color(0, 0, 0, 0.4392157)
@@ -28,6 +30,13 @@ corner_radius_bottom_right = 5
 bg_color = Color(0.29877496, 0.5674968, 0.35507226, 1)
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
+
+[sub_resource type="AnimatedTexture" id="AnimatedTexture_gycre"]
+frames = 2
+frame_0/texture = ExtResource("5_obcwv")
+frame_0/duration = 0.1
+frame_1/texture = ExtResource("6_bo1jx")
+frame_1/duration = 0.1
 
 [node name="UI" type="CanvasLayer" unique_id=855579192]
 script = ExtResource("1_ks8t7")
@@ -319,9 +328,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -306.5
-offset_top = 35.38
+offset_top = 8.0
 offset_right = 306.5
-offset_bottom = 186.38
+offset_bottom = 159.0
 grow_horizontal = 2
 theme_override_fonts/font = ExtResource("4_vkava")
 theme_override_font_sizes/font_size = 150
@@ -334,9 +343,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -305.0
-offset_top = 193.0
+offset_top = 155.0
 offset_right = 308.0
-offset_bottom = 278.0
+offset_bottom = 240.0
 grow_horizontal = 2
 theme_override_fonts/font = ExtResource("4_vkava")
 theme_override_font_sizes/font_size = 84
@@ -352,9 +361,9 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -150.0
-offset_top = -310.0
+offset_top = -259.0
 offset_right = 150.0
-offset_bottom = -90.0
+offset_bottom = -39.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 20
@@ -370,6 +379,22 @@ custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Main Menu"
+
+[node name="SadHampter" type="TextureRect" parent="GameOverPanel" unique_id=1149345229]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = -75.0
+offset_right = 170.0
+offset_bottom = 145.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.5, 0.5)
+texture = SubResource("AnimatedTexture_gycre")
 
 [connection signal="pressed" from="GameOverPanel/VBoxContainer/RetryButton" to="." method="_on_retry_button_pressed"]
 [connection signal="pressed" from="GameOverPanel/VBoxContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
