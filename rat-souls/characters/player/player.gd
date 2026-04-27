@@ -86,9 +86,13 @@ var combat_visual_feedback
 var is_hit: bool = false
 var hit_timer: float = 0.0
 @export var stun_duration: float = 1.0
+@export var death_delay: float = 3.0
 
 # Health
 var health: float = 5.0
+var is_dead: bool = false
+var death_timer: float = 0.0
+var death_ui_shown: bool = false
 
 
 func _ready() -> void:
@@ -104,6 +108,8 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if is_dead:
+		return
 	if event is InputEventMouseMotion:
 		if is_parrying:
 			return
@@ -115,6 +121,11 @@ func _input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if is_dead:
+		_update_death(delta)
+		_lock_rotation_constraints()
+		return
+
 	_update_timers(delta)
 	_handle_lock_on_toggle()
 	_validate_lock_target()
@@ -135,6 +146,30 @@ func _physics_process(delta: float) -> void:
 	_lock_rotation_constraints()
 	move_and_slide()
 	_update_footsteps(direction, delta)
+
+
+func _update_death(delta: float) -> void:
+	velocity = Vector3.ZERO
+	if not death_ui_shown:
+		death_timer -= delta
+		if death_timer <= 0.0:
+			death_ui_shown = true
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+			var ui: Node = _find_ui_node()
+			if ui != null and ui.has_method("show_game_over"):
+				ui.show_game_over()
+
+
+func _find_ui_node() -> Node:
+	var current_scene: Node = get_tree().current_scene
+	if current_scene == null:
+		return null
+
+	var direct_ui: Node = current_scene.get_node_or_null("UI")
+	if direct_ui != null:
+		return direct_ui
+
+	return current_scene.find_child("UI", true, false)
 
 
 func _play_rig_animation(animation_name: StringName) -> void:
@@ -429,6 +464,8 @@ func _get_lock_forward_direction() -> Vector3:
 
 
 func _try_start_attack() -> void:
+	if is_dead:
+		return
 	if is_hit or is_parrying:
 		return
 	if Input.is_action_just_pressed("attack") and attack_cooldown_timer <= 0.0 and not is_attacking and not is_attack_winding_up:
@@ -447,6 +484,8 @@ func _try_start_attack() -> void:
 
 
 func _try_start_parry() -> void:
+	if is_dead:
+		return
 	if is_hit or is_parrying:
 		return
 	if not Input.is_action_just_pressed("parry"):
@@ -495,6 +534,8 @@ func _update_attack(delta: float) -> void:
 
 
 func _try_start_dodge(direction: Vector3) -> void:
+	if is_dead:
+		return
 	if is_hit or is_parrying:
 		return
 	if Input.is_action_just_pressed("dodge") and dodge_cooldown_timer <= 0.0 and not is_dodging and not is_attack_winding_up and not is_attacking:
@@ -607,6 +648,35 @@ func _trigger_hit_flash() -> void:
 		combat_visual_feedback.trigger_hit_flash()
 
 
+func _die() -> void:
+	if is_dead:
+		return
+
+	is_dead = true
+	death_timer = death_delay
+	death_ui_shown = false
+	is_hit = false
+	is_parrying = false
+	is_dodging = false
+	is_attacking = false
+	is_attack_winding_up = false
+	attack_area.monitoring = false
+	if combat_visual_feedback != null:
+		combat_visual_feedback.hide_star()
+	visual_model.scale = Vector3(0.6, 0.6, 0.6)
+	velocity = Vector3.ZERO
+	var scene_root: Node = get_tree().current_scene
+	if scene_root != null:
+		var bgm: AudioStreamPlayer = scene_root.get_node_or_null("BGM") as AudioStreamPlayer
+		if bgm != null:
+			bgm.stop()
+		var defeat_music: AudioStreamPlayer = scene_root.get_node_or_null("DefeatMusic") as AudioStreamPlayer
+		if defeat_music != null:
+			defeat_music.play()
+	_play_rig_animation("Death")
+	print("Player died")
+
+
 func _face_attack_side_toward(target: Node3D) -> void:
 	var to_target: Vector3 = target.global_position - global_position
 	to_target.y = 0.0
@@ -620,6 +690,9 @@ func _face_attack_side_toward(target: Node3D) -> void:
 
 # Take damage from enemy
 func take_damage(amount, source) -> void:
+	if is_dead:
+		return
+
 	# Check the source of damage
 	if source == null or source == self or not source.is_in_group("enemy"):
 		return
@@ -645,6 +718,10 @@ func take_damage(amount, source) -> void:
 		return
 
 	health -= amount
+	if health <= 0:
+		_die()
+		return
+
 	_trigger_hit_flash()
 	damaged_sfx.play()
 	print("Player hit! Health:", health)
@@ -660,7 +737,3 @@ func take_damage(amount, source) -> void:
 	velocity = (global_position - source.global_position).normalized() * 10.0
 	velocity.y = 1.5
 	
-	if health <= 0:
-		if combat_visual_feedback != null:
-			combat_visual_feedback.hide_star()
-		print("Player died")

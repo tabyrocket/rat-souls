@@ -1,19 +1,24 @@
 [gd_scene format=3 uid="uid://dmkp2dicjnoit"]
 
 [ext_resource type="PackedScene" uid="uid://3kuq0wfqgwca" path="res://characters/player/player.tscn" id="1_g7g4h"]
-[ext_resource type="Texture2D" uid="uid://mu440am4ewul" path="res://assets/world/quadrangle_sunny_4k.exr" id="2_j8ivh"]
 [ext_resource type="Texture2D" uid="uid://dk7pyoxf07ucc" path="res://icon.svg" id="2_nd71p"]
+[ext_resource type="Texture2D" uid="uid://c7irgmhcsyycu" path="res://assets/images/soil-seamless-texture-2k-pixel-exr-5-jpg-5-29-01.jpg" id="2_s36qc"]
 [ext_resource type="AudioStream" uid="uid://coynmlws2v3om" path="res://assets/sound/bgm/challenge_music.mp3" id="4_7ddre"]
 [ext_resource type="Script" uid="uid://ba76xfok4c48a" path="res://scenes/game_manager.gd" id="4_rnaij"]
+[ext_resource type="Texture2D" uid="uid://cs5ghb3pmcnet" path="res://assets/world/rogland_clear_night_4k.exr" id="4_s36qc"]
 [ext_resource type="PackedScene" uid="uid://jnkio4dvpi3" path="res://ui/ui.tscn" id="6_3qnke"]
 [ext_resource type="PackedScene" uid="uid://dlseu03u7maj0" path="res://ui/psx_view.tscn" id="7_wtsjf"]
+[ext_resource type="AudioStream" uid="uid://b3kt6tfcdw4sw" path="res://assets/sound/bgm/sad-meow-song.mp3" id="8_6qxox"]
 [ext_resource type="Script" uid="uid://r6oj6j5slrxy" path="res://scenes/enemy_spawner.gd" id="8_spawner"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gthg3"]
+albedo_texture = ExtResource("2_s36qc")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7ddre"]
 albedo_texture = ExtResource("2_nd71p")
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_nd71p"]
-panorama = ExtResource("2_j8ivh")
+panorama = ExtResource("4_s36qc")
 
 [sub_resource type="Sky" id="Sky_7ddre"]
 sky_material = SubResource("PanoramaSkyMaterial_nd71p")
@@ -30,6 +35,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.88678, 0)
 
 [node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=383803660]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.29860687, 0, 8.673187)
+material_override = SubResource("StandardMaterial3D_gthg3")
 use_collision = true
 size = Vector3(150, 0.25, 150)
 material = SubResource("StandardMaterial3D_7ddre")
@@ -53,6 +59,10 @@ script = ExtResource("8_spawner")
 stream = ExtResource("4_7ddre")
 volume_db = -80.0
 autoplay = true
+bus = &"BGM"
+
+[node name="DefeatMusic" type="AudioStreamPlayer" parent="." unique_id=1618205728]
+stream = ExtResource("8_6qxox")
 bus = &"BGM"
 
 [node name="UI" parent="." unique_id=855579192 instance=ExtResource("6_3qnke")]

@@ -5,6 +5,8 @@ extends CanvasLayer
 @onready var stamina_bar: ProgressBar = $HBoxContainer/VBoxContainer/StaminaBar
 @onready var pause_panel: Control = $PausePanel
 @onready var settings_panel: Control = $SettingsPanel
+@onready var game_over_panel: Control = $GameOverPanel
+@onready var final_score_label: Label = $GameOverPanel/FinalScoreLabel
 @onready var resume_button: Button = $PausePanel/VBoxContainer/ResumeButton
 @onready var settings_button: Button = $PausePanel/VBoxContainer/SettingsButton
 @onready var exit_button: Button = $PausePanel/VBoxContainer/ExitButton
@@ -31,6 +33,7 @@ var base_controller_sensitivity: float = 0.0
 var base_master_volume_linear: float = 1.0
 var base_bgm_volume_linear: float = 1.0
 var base_sfx_volume_linear: float = 1.0
+var game_manager: Node = null
 
 
 func _ready() -> void:
@@ -43,6 +46,7 @@ func _ready() -> void:
 	stamina_bar.step = 0.01
 	pause_panel.hide()
 	settings_panel.hide()
+	game_over_panel.hide()
 	mouse_sensitivity_slider.value = 1.0
 	controller_sensitivity_slider.value = 1.0
 	master_volume_slider.value = 1.0
@@ -81,6 +85,31 @@ func _refresh_player_reference() -> void:
 	player = refreshed_player
 	_cache_player_sensitivity_defaults()
 	_apply_sensitivity_settings()
+
+
+func _refresh_game_manager_reference() -> void:
+	if game_manager != null and is_instance_valid(game_manager):
+		return
+
+	var scene_root: Node = get_tree().current_scene
+	if scene_root == null:
+		game_manager = null
+		return
+
+	game_manager = scene_root.get_node_or_null("GameManager")
+
+
+func _get_final_score() -> int:
+	_refresh_game_manager_reference()
+	if game_manager == null or not is_instance_valid(game_manager):
+		return 0
+	if not game_manager.has_method("get_score"):
+		return 0
+
+	var score_value: Variant = game_manager.call("get_score")
+	if score_value is int:
+		return max(0, score_value)
+	return 0
 
 
 func _cache_player_sensitivity_defaults() -> void:
@@ -274,3 +303,20 @@ func _update_target_indicator() -> void:
 	var screen_pos: Vector2 = camera.unproject_position(locked_enemy.global_position)
 	target_indicator.global_position = screen_pos - (target_indicator.size * 0.5)
 	target_indicator.show()
+
+
+func _on_retry_button_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/test_scene.tscn")
+
+
+func _on_main_menu_button_pressed() -> void:
+	push_warning("Main menu scene does not exist yet. Placeholder path: %s" % MAIN_MENU_SCENE_PATH)
+	# get_tree().paused = false
+	# get_tree().change_scene_to_file(MAIN_MENU_SCENE_PATH)
+
+
+func show_game_over() -> void:
+	pause_panel.hide()
+	settings_panel.hide()
+	final_score_label.text = "Final Score: %d" % _get_final_score()
+	game_over_panel.show()
