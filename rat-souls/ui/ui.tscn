@@ -315,6 +315,7 @@ layout_mode = 2
 text = "Back"
 
 [node name="GameOverPanel" type="ColorRect" parent="." unique_id=1064749623]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
