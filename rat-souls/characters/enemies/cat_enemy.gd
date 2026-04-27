@@ -150,6 +150,10 @@ func _physics_process(delta: float) -> void:
 		if not _has_valid_player():
 			return
 
+	if global_position.y < -50.0:
+		queue_free()
+		return
+
 	registry_maintenance_timer -= delta
 	if registry_maintenance_timer <= 0.0:
 		_cleanup_static_pack()

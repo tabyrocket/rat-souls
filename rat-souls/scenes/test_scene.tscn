@@ -17,6 +17,8 @@ albedo_texture = ExtResource("2_s36qc")
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7ddre"]
 albedo_texture = ExtResource("2_nd71p")
 
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_s36qc"]
+
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_nd71p"]
 panorama = ExtResource("4_s36qc")
 
@@ -39,6 +41,40 @@ material_override = SubResource("StandardMaterial3D_gthg3")
 use_collision = true
 size = Vector3(150, 0.25, 150)
 material = SubResource("StandardMaterial3D_7ddre")
+
+[node name="Walls" type="Node" parent="CSGBox3D" unique_id=1401497410]
+
+[node name="Wall1" type="RigidBody3D" parent="CSGBox3D/Walls" unique_id=424599019]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -65.787735)
+freeze = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CSGBox3D/Walls/Wall1" unique_id=1057481259]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+shape = SubResource("WorldBoundaryShape3D_s36qc")
+
+[node name="Wall2" type="RigidBody3D" parent="CSGBox3D/Walls" unique_id=1685307461]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 83.395454)
+freeze = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CSGBox3D/Walls/Wall2" unique_id=265425126]
+transform = Transform3D(-1, 8.742278e-08, -3.821371e-15, 0, -4.371139e-08, -1, -8.742278e-08, -1, 4.371139e-08, 0, 0, 0)
+shape = SubResource("WorldBoundaryShape3D_s36qc")
+
+[node name="Wall3" type="RigidBody3D" parent="CSGBox3D/Walls" unique_id=439230524]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 74.34715, 0, 0.4953041)
+freeze = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CSGBox3D/Walls/Wall3" unique_id=1276704968]
+transform = Transform3D(-4.371139e-08, -1, 4.371139e-08, 0, -4.371139e-08, -1, 1, -4.371139e-08, 1.9106855e-15, 0, 0, 0)
+shape = SubResource("WorldBoundaryShape3D_s36qc")
+
+[node name="Wall4" type="RigidBody3D" parent="CSGBox3D/Walls" unique_id=2023982802]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.89045, 0, 0.4953041)
+freeze = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CSGBox3D/Walls/Wall4" unique_id=1693161361]
+transform = Transform3D(1.3113416e-07, 1, -4.371139e-08, 0, -4.371139e-08, -1, -1, 1.3113416e-07, -5.7320566e-15, 0, 0, 0)
+shape = SubResource("WorldBoundaryShape3D_s36qc")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1509388158]
 transform = Transform3D(1, 0, 0, 0, -0.4183268, 0.90829664, 0, -0.90829664, -0.4183268, 0, 17.952576, 7.8374577)
