@@ -51,7 +51,7 @@ func _play_rat_intro_animation() -> void:
 
 
 func _play_title_intro_sequence() -> void:
-	await get_tree().create_timer(2.0).timeout
+	await get_tree().create_timer(1.0).timeout
 	_fade_in_title_label()
 
 	await get_tree().create_timer(2.0).timeout

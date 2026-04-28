@@ -99,7 +99,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Title" type="Control" parent="Elements/Root" unique_id=1976864894]
-visible = false
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0

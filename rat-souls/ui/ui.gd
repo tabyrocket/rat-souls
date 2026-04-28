@@ -7,6 +7,7 @@ extends CanvasLayer
 @onready var settings_panel: Control = $SettingsPanel
 @onready var game_over_panel: Control = $GameOverPanel
 @onready var final_score_label: Label = $GameOverPanel/FinalScoreLabel
+@onready var retry_button: Button = $GameOverPanel/VBoxContainer/RetryButton
 @onready var resume_button: Button = $PausePanel/VBoxContainer/ResumeButton
 @onready var settings_button: Button = $PausePanel/VBoxContainer/SettingsButton
 @onready var exit_button: Button = $PausePanel/VBoxContainer/ExitButton
@@ -320,3 +321,9 @@ func show_game_over() -> void:
 	settings_panel.hide()
 	final_score_label.text = "Final Score: %d" % _get_final_score()
 	game_over_panel.show()
+	call_deferred("_focus_retry_button")
+
+
+func _focus_retry_button() -> void:
+	if game_over_panel.visible:
+		retry_button.grab_focus()
