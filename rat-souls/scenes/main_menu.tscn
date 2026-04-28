@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c7irgmhcsyycu" path="res://assets/images/soil-seamless-texture-2k-pixel-exr-5-jpg-5-29-01.jpg" id="3_wu84c"]
 [ext_resource type="Texture2D" uid="uid://dk7pyoxf07ucc" path="res://icon.svg" id="4_8ln24"]
 [ext_resource type="PackedScene" uid="uid://dhfy2g2nfuiwq" path="res://characters/player/model/rat-rigged.glb" id="5_8ln24"]
+[ext_resource type="Script" uid="uid://s2wivcs8xyxk" path="res://scenes/sun.gd" id="6_oa1go"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_ekxnf"]
 line_spacing = -64.36
@@ -119,6 +120,7 @@ transform = Transform3D(1, 0, 0, 0, -0.4183268, 0.90829664, 0, -0.90829664, -0.4
 light_color = Color(1, 1, 0.7764706, 1)
 light_energy = 0.5
 shadow_enabled = true
+script = ExtResource("6_oa1go")
 
 [node name="rat-rigged" parent="." unique_id=1811677294 instance=ExtResource("5_8ln24")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 2.7743301, 0, 0)
