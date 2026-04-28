@@ -15,7 +15,7 @@ extends Node
 
 ## The internal 3D render resolution (width in pixels).
 ## 320 → classic PS1.  480 → slightly higher but still very retro.
-const PSX_RENDER_WIDTH: int = 240
+const PSX_RENDER_WIDTH: int = 320
 
 ## Computed scale factor applied to Viewport.scaling_3d_scale.
 var _scale: float = 1.0
