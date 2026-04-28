@@ -10,7 +10,8 @@ const COMBAT_VISUAL_FEEDBACK = preload("res://characters/shared/combat_visual_fe
 const BASE_SCALE: Vector3 = Vector3(0.4, 0.4, 0.4)
 const WINDUP_SCALE: Vector3 = Vector3(0.4, 0.6, 0.4)
 @export var health: float = 5.0
-@export var speed: float = 3.0
+@export var speed: float = 5.0
+var _original_speed: float = 0.0
 @export var attack_range: float = 2.0
 @export var attack_damage: float = 1.0
 @export var attack_windup: float = 0.6
@@ -117,6 +118,7 @@ var death_timer: float = 0.0
 func _ready() -> void:
 	rng.seed = int(Time.get_ticks_usec()) + get_instance_id()
 	_register_pack_member()
+	_original_speed = speed
 	_cleanup_static_pack()
 	_configure_separation_sensor()
 	_initialize_orbit_profile()
@@ -166,6 +168,11 @@ func _physics_process(delta: float) -> void:
 	var to_player_flat: Vector3 = _get_to_player_flat()
 	var distance_to_player: float = to_player_flat.length()
 	var direction_to_player: Vector3 = Vector3.ZERO
+	# Adjust speed based on lock‑on range (>30 units)
+	if distance_to_player > 30.0:
+		speed = _original_speed * 3.0
+	else:
+		speed = _original_speed
 	if distance_to_player > 0.001:
 		direction_to_player = to_player_flat.normalized()
 
