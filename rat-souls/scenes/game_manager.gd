@@ -10,6 +10,7 @@ var score_label: Label = null
 
 
 func _ready() -> void:
+	add_to_group("game_manager")
 	score_label = get_node_or_null(score_label_path) as Label
 	_update_score_label()
 	emit_signal("score_changed", score)

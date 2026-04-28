@@ -3,14 +3,16 @@ extends Node
 @export var enemy_scene: PackedScene = preload("res://characters/enemies/cat_enemy.tscn")
 @export var player_path: NodePath = NodePath("../Player")
 @export var spawn_parent_path: NodePath = NodePath("..")
+@export var spawn_area_path: NodePath = NodePath("../CSGBox3D")
 
 @export_group("Spawn Position")
 @export var spawn_radius: float = 20.0
-@export var spawn_height_offset: float = -0.75
+@export var spawn_height_offset: float = 1.85
+@export var spawn_padding: float = 1.0
 
-const MUTATION_MIN: float = 0.1
-const MUTATION_MAX: float = 3.0
-const MUTATION_FAVORED_MIN: float = 0.2
+const MUTATION_MIN: float = 0.2
+const MUTATION_MAX: float = 2.0
+const MUTATION_FAVORED_MIN: float = 0.5
 const MUTATION_FAVORED_MAX: float = 1.2
 const MUTATION_FAVORED_WEIGHT: float = 0.8
 
@@ -23,7 +25,10 @@ const MUTATION_FAVORED_WEIGHT: float = 0.8
 
 var player: Node3D = null
 var spawn_parent: Node = null
+var spawn_area: Node = null
 var spawn_timer: float = 0.0
+var game_manager: Node = null
+
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
@@ -77,6 +82,14 @@ func _resolve_references() -> void:
 		if spawn_parent == null:
 			spawn_parent = get_tree().current_scene
 
+	if not is_instance_valid(spawn_area):
+		spawn_area = get_node_or_null(spawn_area_path)
+
+	if not is_instance_valid(game_manager):
+		game_manager = get_node_or_null("../GameManager")
+		if game_manager == null:
+			game_manager = get_tree().get_first_node_in_group("game_manager")
+
 
 func _get_alive_enemy_count() -> int:
 	var count: int = 0
@@ -92,7 +105,12 @@ func _get_alive_enemy_count() -> int:
 
 
 func _get_current_enemy_cap() -> int:
-	return max(1, enemy_cap_base)
+	var score: int = 0
+	if is_instance_valid(game_manager) and game_manager.has_method("get_score"):
+		score = game_manager.get_score()
+	
+	var scaled_cap: float = float(enemy_cap_base) + (float(score) * 0.5)
+	return int(floor(max(1.0, scaled_cap)))
 
 
 func _get_spawn_delay_for(alive_count: int, cap: int) -> float:
@@ -114,19 +132,38 @@ func _spawn_enemy() -> bool:
 	if enemy_instance == null:
 		return false
 
-	var angle_radians: float = rng.randf_range(0.0, TAU)
-	var radius: float = max(0.0, spawn_radius)
-	var offset: Vector3 = Vector3(cos(angle_radians), 0.0, sin(angle_radians)) * radius
-	var spawn_position: Vector3 = player.global_position + offset
-	spawn_position.y += spawn_height_offset
+	var spawn_position: Vector3 = _get_spawn_position()
 
 	enemy_instance.set("mutation", _roll_mutation())
 
+	if enemy_instance is Node3D and spawn_parent is Node3D:
+		(enemy_instance as Node3D).position = (spawn_parent as Node3D).to_local(spawn_position)
+
 	spawn_parent.add_child(enemy_instance)
-	if enemy_instance is Node3D:
-		(enemy_instance as Node3D).global_position = spawn_position
 
 	return true
+
+
+func _get_spawn_position() -> Vector3:
+	if is_instance_valid(spawn_area):
+		var spawn_size: Variant = spawn_area.get("size")
+		if spawn_size is Vector3:
+			var area_origin: Vector3 = (spawn_area as Node3D).global_position
+			var area_half_size: Vector3 = (spawn_size as Vector3) * 0.5
+			var x_extent: float = max(0.0, area_half_size.x - spawn_padding)
+			var z_extent: float = max(0.0, area_half_size.z - spawn_padding)
+			return Vector3(
+				rng.randf_range(area_origin.x - x_extent, area_origin.x + x_extent),
+				area_origin.y + area_half_size.y + spawn_height_offset,
+				rng.randf_range(area_origin.z - z_extent, area_origin.z + z_extent)
+			)
+
+	var angle_radians: float = rng.randf_range(0.0, TAU)
+	var radius: float = max(0.0, spawn_radius)
+	var offset: Vector3 = Vector3(cos(angle_radians), 0.0, sin(angle_radians)) * radius
+	var fallback_position: Vector3 = player.global_position + offset
+	fallback_position.y += spawn_height_offset
+	return fallback_position
 
 
 func _roll_mutation() -> float:
