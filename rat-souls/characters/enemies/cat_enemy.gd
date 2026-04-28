@@ -8,7 +8,7 @@ const COMBAT_VISUAL_FEEDBACK = preload("res://characters/shared/combat_visual_fe
 # Base combat settings
 @export var mutation: float = 1.0
 const BASE_SCALE: Vector3 = Vector3(0.4, 0.4, 0.4)
-const WINDUP_SCALE: Vector3 = Vector3(0.6, 0.2, 0.6)
+const WINDUP_SCALE: Vector3 = Vector3(0.4, 0.6, 0.4)
 @export var health: float = 5.0
 @export var speed: float = 3.0
 @export var attack_range: float = 2.0
@@ -101,12 +101,14 @@ var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var star_rotation_speed: float = 6.0
 var combat_visual_feedback
 var is_defeated: bool = false
+var death_timer: float = 0.0
 
 # References
 @onready var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
 @onready var attack_area: Area3D = $AttackArea
 @onready var separation_area: Area3D = $SeparationArea
-@onready var visual_model: Node3D = $CatMesh
+@onready var visual_model: Node3D = $CatRig
+@onready var animation_player: AnimationPlayer = $CatRig/AnimationPlayer
 @onready var damaged_sfx: AudioStreamPlayer3D = $DamagedSFX
 @onready var gong_sfx: AudioStreamPlayer3D = $GongSFX
 @onready var star: Node3D = get_node_or_null("Star") as Node3D
@@ -167,6 +169,12 @@ func _physics_process(delta: float) -> void:
 	if distance_to_player > 0.001:
 		direction_to_player = to_player_flat.normalized()
 
+	if is_defeated:
+		death_timer -= delta
+		if death_timer <= 0.0:
+			queue_free()
+		return
+
 	match state:
 		State.HIT:
 			_state_hit(delta)
@@ -179,6 +187,7 @@ func _physics_process(delta: float) -> void:
 		State.COOLDOWN:
 			_state_cooldown(delta, direction_to_player, distance_to_player)
 
+	_update_animation()
 	move_and_slide()
 
 
@@ -774,9 +783,16 @@ func take_damage(amount, source) -> void:
 
 	if health <= 0:
 		is_defeated = true
+		death_timer = 5.0
 		_release_attack_claim()
 		emit_signal("defeated", self)
-		queue_free()
+		if combat_visual_feedback != null:
+			combat_visual_feedback.hide_star()
+		var hb: Node = get_node_or_null("EnemyHealthBar")
+		if is_instance_valid(hb):
+			hb.queue_free()
+		if is_instance_valid(animation_player):
+			animation_player.play("Death")
 		return
 
 	if state == State.STUNNED:
@@ -817,6 +833,9 @@ func apply_parry_stun(duration: float = -1.0) -> void:
 	parry_stun_timer = resolved_duration
 	gong_sfx.play()
 
+	if is_instance_valid(animation_player):
+		animation_player.play("Stun")
+
 	if combat_visual_feedback != null:
 		combat_visual_feedback.show_star(true)
 
@@ -849,3 +868,30 @@ func _apply_attack_hits() -> void:
 		if body.has_method("take_damage") and not body in hit_bodies:
 			hit_bodies.append(body)
 			body.take_damage(dmg, self)
+
+
+func _update_animation() -> void:
+	if not is_instance_valid(animation_player):
+		return
+
+	if is_defeated:
+		return
+
+	var current_anim: StringName = animation_player.current_animation
+
+	if state == State.ATTACK and attack_timer > attack_duration:
+		animation_player.speed_scale = 2.2
+		if current_anim != "Attack":
+			animation_player.play("Attack")
+	elif state == State.STUNNED:
+		animation_player.speed_scale = 1.0
+		if current_anim != "Stun":
+			animation_player.play("Stun")
+	elif state != State.ATTACK or attack_timer <= attack_duration:
+		animation_player.speed_scale = 1.0
+		if current_anim != "Walk":
+			animation_player.play("Walk")
+
+
+func is_targetable() -> bool:
+	return not is_defeated

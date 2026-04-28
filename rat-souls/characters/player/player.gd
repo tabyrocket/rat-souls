@@ -265,7 +265,7 @@ func _handle_lock_on_toggle() -> void:
 
 
 func _validate_lock_target() -> void:
-	if is_locked_on and not is_instance_valid(lock_target):
+	if is_locked_on and not _is_lock_target_valid():
 		var next_target: Node3D = find_lock_target()
 		if next_target != null:
 			_set_lock_target(next_target)
@@ -311,7 +311,17 @@ func _update_lock_on_orientation(delta: float) -> void:
 
 
 func _has_lock_target() -> bool:
-	return is_locked_on and is_instance_valid(lock_target)
+	return is_locked_on and _is_lock_target_valid()
+
+
+func _is_lock_target_valid() -> bool:
+	if not is_instance_valid(lock_target):
+		return false
+
+	if lock_target.has_method("is_targetable"):
+		return lock_target.is_targetable()
+
+	return true
 
 
 func has_lock_target() -> bool:
@@ -335,6 +345,9 @@ func find_lock_target() -> Node3D:
 			continue
 
 		var enemy: Node3D = e
+		if enemy.has_method("is_targetable") and not enemy.is_targetable():
+			continue
+
 		var dist: float = global_position.distance_to(enemy.global_position)
 
 		if dist < closest_dist and dist <= lock_on_range:
@@ -402,6 +415,9 @@ func _find_lock_target_in_screen_direction(direction_sign: float) -> Node3D:
 			continue
 
 		var enemy: Node3D = e
+		if enemy.has_method("is_targetable") and not enemy.is_targetable():
+			continue
+
 		if enemy == lock_target:
 			continue
 

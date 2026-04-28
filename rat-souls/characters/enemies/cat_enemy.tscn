@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://b6plhk6sut0kt" path="res://characters/enemies/orange-cat/cat-mesh_catface.jpg" id="3_ht1sg"]
 [ext_resource type="AudioStream" uid="uid://oim60qq1hmr3" path="res://assets/sound/sfx/meowrgh.mp3" id="3_wsesy"]
 [ext_resource type="PackedScene" uid="uid://bhf4pe5ooixdl" path="res://characters/enemies/enemy_health_bar.tscn" id="4_637aq"]
+[ext_resource type="PackedScene" uid="uid://bj3tt55wyss3m" path="res://characters/enemies/orange-cat/cat-rigged.glb" id="4_r1i4n"]
 [ext_resource type="AudioStream" uid="uid://dsb8ctnabkije" path="res://assets/sound/sfx/taco-bell-bong-sfx.mp3" id="6_ht1sg"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_r1i4n"]
@@ -437,44 +438,8 @@ script = ExtResource("1_yv15o")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=459386604]
 shape = SubResource("CapsuleShape3D_r1i4n")
 
-[node name="CatMesh" type="Node3D" parent="." unique_id=1312443944]
-transform = Transform3D(-0.4, 0, -6.039832e-08, 0, 0.4, 0, 6.039832e-08, 0, -0.4, 0, -0.8620892, 0)
-
-[node name="Body" type="MeshInstance3D" parent="CatMesh" unique_id=2105849695]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9888415, 0)
-mesh = SubResource("ArrayMesh_yfmor")
-
-[node name="Arms" type="MeshInstance3D" parent="CatMesh/Body" unique_id=1611821042]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9656654, 0.33092093, -0.0044070766)
-mesh = SubResource("ArrayMesh_cfg72")
-
-[node name="Hands" type="MeshInstance3D" parent="CatMesh/Body/Arms" unique_id=1743618435]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5178826, -0.018826246, 0.0044071074)
-mesh = SubResource("ArrayMesh_1p3ut")
-
-[node name="Collar" type="MeshInstance3D" parent="CatMesh/Body" unique_id=624876191]
-transform = Transform3D(0.54119647, 0, 0, 0, 0.6272602, 0, 0, 0, 0.44274184, 0, 0.6841068, 0)
-mesh = SubResource("ArrayMesh_51eag")
-
-[node name="Head" type="MeshInstance3D" parent="CatMesh/Body" unique_id=1782127514]
-transform = Transform3D(0.9465951, 0, 0.32242477, 0, 1, 0, -0.32242477, 0, 0.9465951, 0, 1.5216503, 0)
-mesh = SubResource("ArrayMesh_g242k")
-
-[node name="Cube" type="MeshInstance3D" parent="CatMesh/Body/Head" unique_id=1176852091]
-transform = Transform3D(-0.97467494, -0.024899833, 0.22223565, -0.009532027, 0.9975044, 0.06995757, -0.22342297, 0.06606753, -0.97247994, 0.40648153, 0.69569564, 0.24157296)
-mesh = SubResource("ArrayMesh_xa543")
-
-[node name="Legs" type="MeshInstance3D" parent="CatMesh/Body" unique_id=1534993736]
-transform = Transform3D(0.9345282, 0, 0, 0, 1.0720189, 0, 0, 0, 0.9345282, 0.25386837, -1.1774478, -0.0044072187)
-mesh = SubResource("ArrayMesh_jfy1y")
-
-[node name="Feet" type="MeshInstance3D" parent="CatMesh/Body/Legs" unique_id=1973220754]
-transform = Transform3D(0.19713083, 0, 0, 0, 0.09941837, 0, 0, 0, 0.37484562, 0.0006676018, -0.6555666, 0.1379085)
-mesh = SubResource("ArrayMesh_sotvi")
-
-[node name="Tail" type="MeshInstance3D" parent="CatMesh/Body" unique_id=595175914]
-transform = Transform3D(-0.08672429, 0.14262667, 0.007670004, 0.005404312, -0.0968814, 0.08782493, 0.01820218, 0.7083093, 0.010468104, 0.14514339, -0.67870164, -0.5692772)
-mesh = SubResource("ArrayMesh_88kmw")
+[node name="CatRig" parent="." unique_id=1669830526 instance=ExtResource("4_r1i4n")]
+transform = Transform3D(-0.4, 0, 3.4969112e-08, 0, 0.4, 0, -3.4969112e-08, 0, -0.4, 0, -0.86, 0)
 
 [node name="PlaceholderMesh" type="MeshInstance3D" parent="." unique_id=1449112155]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
