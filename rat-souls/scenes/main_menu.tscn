@@ -3,10 +3,26 @@
 [ext_resource type="FontFile" uid="uid://qq8p6di1da4x" path="res://assets/fonts/Micro5-Regular.ttf" id="1_ekxnf"]
 [ext_resource type="Script" uid="uid://d27khy4ph0els" path="res://scenes/main_menu.gd" id="1_rtw2f"]
 [ext_resource type="Texture2D" uid="uid://cs5ghb3pmcnet" path="res://assets/world/rogland_clear_night_4k.exr" id="2_bqqt6"]
+[ext_resource type="Texture2D" uid="uid://dmn85lyfkw1pd" path="res://assets/images/ratpunch.png" id="3_1dfpl"]
+[ext_resource type="Texture2D" uid="uid://c27tcfitg7kfx" path="res://assets/images/input-icons/kbm/WModernBlack.png" id="3_7b55j"]
 [ext_resource type="Texture2D" uid="uid://c7irgmhcsyycu" path="res://assets/images/soil-seamless-texture-2k-pixel-exr-5-jpg-5-29-01.jpg" id="3_wu84c"]
+[ext_resource type="Texture2D" uid="uid://bya6hlouswydu" path="res://assets/images/input-icons/kbm/AModernBlack.png" id="4_5pajh"]
 [ext_resource type="Texture2D" uid="uid://dk7pyoxf07ucc" path="res://icon.svg" id="4_8ln24"]
-[ext_resource type="PackedScene" uid="uid://dhfy2g2nfuiwq" path="res://characters/player/model/rat-rigged.glb" id="5_8ln24"]
+[ext_resource type="Texture2D" uid="uid://bfrg61l8yupgc" path="res://assets/images/ratstun.png" id="4_qywvv"]
+[ext_resource type="Texture2D" uid="uid://bs438fcjs66s2" path="res://assets/images/rathi.png" id="5_3wgol"]
+[ext_resource type="PackedScene" uid="uid://djpat8jqsv7f5" path="res://characters/player/model/rat-rigged.glb" id="5_8ln24"]
+[ext_resource type="Texture2D" uid="uid://dbsmnla0o3cky" path="res://assets/images/input-icons/kbm/SModernBlack.png" id="5_j7ex8"]
+[ext_resource type="Texture2D" uid="uid://cg4rx4kd2g82m" path="res://assets/images/input-icons/kbm/DModernBlack.png" id="6_a8gd2"]
 [ext_resource type="Script" uid="uid://s2wivcs8xyxk" path="res://scenes/sun.gd" id="6_oa1go"]
+[ext_resource type="Texture2D" uid="uid://cvmb0b7w5dckh" path="res://assets/images/input-icons/controller/LeftStickIddle.png" id="7_8egab"]
+[ext_resource type="Texture2D" uid="uid://cv08ktbkshmj3" path="res://assets/images/input-icons/kbm/QModernBlack.png" id="7_hstxw"]
+[ext_resource type="Texture2D" uid="uid://cc7yidnk6luj2" path="res://assets/images/input-icons/kbm/MouseLeftClick.png" id="8_8egab"]
+[ext_resource type="Texture2D" uid="uid://sfby4tx4o247" path="res://assets/images/input-icons/kbm/MouseRightClick.png" id="9_gw5y6"]
+[ext_resource type="Texture2D" uid="uid://c167i1gu6ea12" path="res://assets/images/input-icons/controller/RightTriggerIddle.png" id="9_svtp6"]
+[ext_resource type="Texture2D" uid="uid://42i2bmwa7ksw" path="res://assets/images/input-icons/kbm/SpaceModernBlack.png" id="10_svtp6"]
+[ext_resource type="Texture2D" uid="uid://dnycu532d5dpm" path="res://assets/images/input-icons/controller/LeftTriggerIddle.png" id="11_1dfpl"]
+[ext_resource type="Texture2D" uid="uid://bohldtni2wely" path="res://assets/images/input-icons/controller/AButtonIddle.png" id="13_qywvv"]
+[ext_resource type="Texture2D" uid="uid://dlbkp43aaotpf" path="res://assets/images/input-icons/controller/RightStickDown.png" id="15_3wgol"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_ekxnf"]
 line_spacing = -64.36
@@ -16,6 +32,41 @@ font_size = 169
 [sub_resource type="LabelSettings" id="LabelSettings_8ln24"]
 font = ExtResource("1_ekxnf")
 font_size = 74
+
+[sub_resource type="LabelSettings" id="LabelSettings_1acrt"]
+font_size = 20
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1dfpl"]
+atlas = ExtResource("3_7b55j")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qywvv"]
+atlas = ExtResource("4_5pajh")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3wgol"]
+atlas = ExtResource("5_j7ex8")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1acrt"]
+atlas = ExtResource("6_a8gd2")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1a85y"]
+atlas = ExtResource("8_8egab")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hl5e0"]
+atlas = ExtResource("9_gw5y6")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_engjn"]
+atlas = ExtResource("10_svtp6")
+region = Rect2(0, 0, 80.12022, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vr8o3"]
+atlas = ExtResource("7_hstxw")
+region = Rect2(0, 0, 16, 16)
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_wu84c"]
 panorama = ExtResource("2_bqqt6")
@@ -48,6 +99,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Title" type="Control" parent="Elements/Root" unique_id=1976864894]
+visible = false
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
@@ -93,15 +145,286 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -137.0
-offset_top = -125.0
-offset_right = 137.0
-offset_bottom = -39.0
+offset_left = -165.0
+offset_top = -102.0
+offset_right = 165.0
+offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_fonts/font = ExtResource("1_ekxnf")
 theme_override_font_sizes/font_size = 77
 text = "I'm ready..."
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Elements/Root/ControlsPanel" unique_id=1315454197]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -502.0
+offset_top = -294.5
+offset_right = 515.0
+offset_bottom = 209.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 31
+alignment = 1
+
+[node name="Story" type="VBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer" unique_id=1972496268]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Story" unique_id=712074054]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Story/VBoxContainer" unique_id=1468105909]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_ekxnf")
+theme_override_font_sizes/font_size = 77
+text = "Story"
+horizontal_alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Story/VBoxContainer" unique_id=1458589006]
+custom_minimum_size = Vector2(640.58, 263.32)
+layout_mode = 2
+color = Color(0.23921569, 0.23921569, 0.23921569, 0.9254902)
+
+[node name="Label" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Story/VBoxContainer/ColorRect" unique_id=1103047123]
+custom_minimum_size = Vector2(625.59, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -312.795
+offset_top = -122.5
+offset_right = 312.795
+offset_bottom = 122.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Endless slaughter. Endless tyranny. Endless sacrifice.
+The felines control everything. The rats have lost.
+
+This is your final stand. The cats must pay. Seek justice. Rage consumes you.
+
+You will die. But not without a fight.
+This is the Rat's End."
+label_settings = SubResource("LabelSettings_1acrt")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Story" unique_id=310756830]
+layout_mode = 2
+
+[node name="Photos" type="HBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Story/CenterContainer" unique_id=1254804446]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Story/CenterContainer/Photos" unique_id=433211548]
+custom_minimum_size = Vector2(125.565, 132.835)
+layout_mode = 2
+texture = ExtResource("3_1dfpl")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextureRect2" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Story/CenterContainer/Photos" unique_id=2076814939]
+custom_minimum_size = Vector2(125.565, 132.835)
+layout_mode = 2
+texture = ExtResource("4_qywvv")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextureRect3" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Story/CenterContainer/Photos" unique_id=975738118]
+custom_minimum_size = Vector2(125.565, 132.835)
+layout_mode = 2
+texture = ExtResource("5_3wgol")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Controls" type="VBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer" unique_id=150410051]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls" unique_id=79247655]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_ekxnf")
+theme_override_font_sizes/font_size = 77
+text = "Controls"
+horizontal_alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls" unique_id=1587902602]
+custom_minimum_size = Vector2(308.855, 422.545)
+layout_mode = 2
+color = Color(0.23921569, 0.23921569, 0.23921569, 0.9254902)
+
+[node name="Controls" type="GridContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect" unique_id=46194792]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -115.0
+offset_top = -191.5
+offset_right = 115.0
+offset_bottom = 191.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 60
+theme_override_constants/v_separation = 33
+columns = 2
+
+[node name="MovementControls" type="CenterContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1433167443]
+layout_mode = 2
+
+[node name="VBoxContainer" type="HBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/MovementControls" unique_id=654846782]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/MovementControls/VBoxContainer" unique_id=1816677883]
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="WASD" type="VBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/MovementControls/VBoxContainer/VBoxContainer" unique_id=813495301]
+layout_mode = 2
+theme_override_constants/separation = -2
+
+[node name="W" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/MovementControls/VBoxContainer/VBoxContainer/WASD" unique_id=600692350]
+layout_mode = 2
+texture = SubResource("AtlasTexture_1dfpl")
+stretch_mode = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/MovementControls/VBoxContainer/VBoxContainer/WASD" unique_id=22139839]
+layout_mode = 2
+theme_override_constants/separation = 1
+
+[node name="A" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/MovementControls/VBoxContainer/VBoxContainer/WASD/HBoxContainer" unique_id=231163317]
+layout_mode = 2
+texture = SubResource("AtlasTexture_qywvv")
+
+[node name="S" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/MovementControls/VBoxContainer/VBoxContainer/WASD/HBoxContainer" unique_id=948442425]
+layout_mode = 2
+texture = SubResource("AtlasTexture_3wgol")
+
+[node name="D" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/MovementControls/VBoxContainer/VBoxContainer/WASD/HBoxContainer" unique_id=240351868]
+layout_mode = 2
+texture = SubResource("AtlasTexture_1acrt")
+
+[node name="LCont" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/MovementControls/VBoxContainer/VBoxContainer" unique_id=441493293]
+layout_mode = 2
+texture = ExtResource("7_8egab")
+stretch_mode = 5
+
+[node name="MovementLabel" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1402713521]
+layout_mode = 2
+text = "Movement"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AttackControls" type="CenterContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1543381817]
+layout_mode = 2
+
+[node name="VBoxContainer" type="HBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/AttackControls" unique_id=272357506]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/AttackControls/VBoxContainer" unique_id=2091580939]
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="M1" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/AttackControls/VBoxContainer/VBoxContainer" unique_id=885372167]
+layout_mode = 2
+texture = SubResource("AtlasTexture_1a85y")
+
+[node name="RTCont" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/AttackControls/VBoxContainer/VBoxContainer" unique_id=1521000114]
+layout_mode = 2
+texture = ExtResource("9_svtp6")
+stretch_mode = 5
+
+[node name="AttackLabel" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=64579065]
+layout_mode = 2
+text = "Attack"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ParryControls" type="CenterContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1288725007]
+layout_mode = 2
+
+[node name="VBoxContainer" type="HBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/ParryControls" unique_id=1721121480]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/ParryControls/VBoxContainer" unique_id=1874299590]
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="M2" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/ParryControls/VBoxContainer/VBoxContainer" unique_id=1453605177]
+layout_mode = 2
+texture = SubResource("AtlasTexture_hl5e0")
+
+[node name="LTCont" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/ParryControls/VBoxContainer/VBoxContainer" unique_id=1690801040]
+layout_mode = 2
+texture = ExtResource("11_1dfpl")
+stretch_mode = 5
+
+[node name="ParryLabel" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=647253121]
+layout_mode = 2
+text = "Parry"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DodgeControls" type="CenterContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1196227910]
+layout_mode = 2
+
+[node name="VBoxContainer" type="HBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/DodgeControls" unique_id=864042494]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/DodgeControls/VBoxContainer" unique_id=1241733731]
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="SPC" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/DodgeControls/VBoxContainer/VBoxContainer" unique_id=253498813]
+layout_mode = 2
+texture = SubResource("AtlasTexture_engjn")
+
+[node name="ACont" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/DodgeControls/VBoxContainer/VBoxContainer" unique_id=1867091448]
+layout_mode = 2
+texture = ExtResource("13_qywvv")
+stretch_mode = 5
+
+[node name="DodgeLabel" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1545770480]
+layout_mode = 2
+text = "Dodge"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LockOnControls" type="CenterContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1993769082]
+layout_mode = 2
+
+[node name="VBoxContainer" type="HBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/LockOnControls" unique_id=1013302135]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/LockOnControls/VBoxContainer" unique_id=325446520]
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="Q" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/LockOnControls/VBoxContainer/VBoxContainer" unique_id=794950755]
+layout_mode = 2
+texture = SubResource("AtlasTexture_vr8o3")
+
+[node name="RCont" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/LockOnControls/VBoxContainer/VBoxContainer" unique_id=1440555843]
+layout_mode = 2
+texture = ExtResource("15_3wgol")
+stretch_mode = 5
+
+[node name="LockOnLabel" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1570893993]
+layout_mode = 2
+text = "Target Lock"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=104206798]
 environment = SubResource("Environment_8ln24")
@@ -122,10 +445,10 @@ light_energy = 0.5
 shadow_enabled = true
 script = ExtResource("6_oa1go")
 
-[node name="rat-rigged" parent="." unique_id=1811677294 instance=ExtResource("5_8ln24")]
+[node name="rat-rigged" parent="." unique_id=2119441825 instance=ExtResource("5_8ln24")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 2.4576788, 0, 0.30073524)
 
-[node name="Skeleton3D" parent="rat-rigged/Armature" parent_id_path=PackedInt32Array(1811677294, 399149498) index="0" unique_id=15673041]
+[node name="Skeleton3D" parent="rat-rigged/Armature" parent_id_path=PackedInt32Array(2119441825, 663344893) index="0" unique_id=514419742]
 bones/0/position = Vector3(-0.8532032, -0.66437036, 0.17064032)
 bones/0/rotation = Quaternion(-0.5082764, 0.5046054, 0.49471438, 0.49222577)
 bones/1/rotation = Quaternion(-0.14751665, 0.6707206, -0.17695892, 0.70502365)

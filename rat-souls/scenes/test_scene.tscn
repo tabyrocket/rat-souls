@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://dlseu03u7maj0" path="res://ui/psx_view.tscn" id="7_wtsjf"]
 [ext_resource type="AudioStream" uid="uid://b3kt6tfcdw4sw" path="res://assets/sound/bgm/sad-meow-song.mp3" id="8_6qxox"]
 [ext_resource type="Script" uid="uid://r6oj6j5slrxy" path="res://scenes/enemy_spawner.gd" id="8_spawner"]
-[ext_resource type="Script" path="res://scenes/sun.gd" id="9_sun"]
+[ext_resource type="Script" uid="uid://s2wivcs8xyxk" path="res://scenes/sun.gd" id="9_sun"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gthg3"]
 albedo_texture = ExtResource("2_s36qc")
@@ -78,11 +78,11 @@ transform = Transform3D(1.3113416e-07, 1, -4.371139e-08, 0, -4.371139e-08, -1, -
 shape = SubResource("WorldBoundaryShape3D_s36qc")
 
 [node name="Sun" type="DirectionalLight3D" parent="." unique_id=1509388158]
-script = ExtResource("9_sun")
 transform = Transform3D(1, 0, 0, 0, -0.4183268, 0.90829664, 0, -0.90829664, -0.4183268, 0, 17.952576, 7.8374577)
 light_color = Color(1, 1, 0.7764706, 1)
 light_energy = 1.2
 shadow_enabled = true
+script = ExtResource("9_sun")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1693026895]
 environment = SubResource("Environment_qjeyg")
