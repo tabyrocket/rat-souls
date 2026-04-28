@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://spappu2fk6ei" path="res://characters/player/player.gd" id="1_508ok"]
 [ext_resource type="Texture2D" uid="uid://b77r6rskatnws" path="res://assets/images/rat.jpg" id="2_5dc8e"]
 [ext_resource type="AudioStream" uid="uid://cdxaqenhkkuvi" path="res://assets/sound/sfx/dash.mp3" id="2_xxgcw"]
-[ext_resource type="PackedScene" uid="uid://dhfy2g2nfuiwq" path="res://characters/player/model/rat-rigged.glb" id="3_dirf7"]
+[ext_resource type="PackedScene" uid="uid://djpat8jqsv7f5" path="res://characters/player/model/rat-rigged.glb" id="3_dirf7"]
 [ext_resource type="AudioStream" uid="uid://c72g7q7c1dovk" path="res://assets/sound/sfx/vine-boom.mp3" id="4_5dc8e"]
 [ext_resource type="AudioStream" uid="uid://u18dsnpuqm75" path="res://assets/sound/sfx/steps/Steps_floor-003.ogg" id="4_ixbpm"]
 
@@ -100,19 +100,8 @@ visible = false
 material_override = SubResource("StandardMaterial3D_ixbpm")
 mesh = SubResource("CapsuleMesh_dnjla")
 
-[node name="RatRig" parent="." unique_id=1811677294 instance=ExtResource("3_dirf7")]
+[node name="RatRig" parent="." unique_id=2119441825 instance=ExtResource("3_dirf7")]
 transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, -1.04, 0)
-
-[node name="Skeleton3D" parent="RatRig/Armature" parent_id_path=PackedInt32Array(1811677294, 399149498) index="0" unique_id=15673041]
-bones/2/position = Vector3(0.38365278, 0.8437769, 1.1100793e-07)
-bones/2/rotation = Quaternion(1.0430813e-07, -1.0197982e-07, 0.9800128, -0.19893493)
-bones/3/position = Vector3(-0.41079307, 0.8437769, 1.5046841e-07)
-bones/3/rotation = Quaternion(0.905477, -0.17230016, -0.38100874, -0.072501086)
-bones/3/scale = Vector3(1, 0.99999994, 1)
-bones/4/position = Vector3(0.2125988, -0.07204039, 0.10403766)
-bones/4/rotation = Quaternion(0.9585987, 0, -0.28476056, -1.2293458e-07)
-bones/5/position = Vector3(-0.20807536, -0.07204037, 0.10403769)
-bones/5/rotation = Quaternion(0.9585987, 1.4901161e-08, -0.2847606, -1.3038516e-07)
 
 [node name="CameraPivot" type="Node3D" parent="." unique_id=1419448908]
 

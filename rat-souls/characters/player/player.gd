@@ -554,7 +554,7 @@ func _try_start_parry() -> void:
 	attack_windup_timer = 0.0
 	is_attacking = false
 	attack_area.monitoring = false
-	visual_model.scale = Vector3(1, 0.8, 0.2)
+	#visual_model.scale = Vector3(1, 0.8, 0.2)
 	hit_bodies.clear()
 	is_dodging = false
 	is_parrying = true
