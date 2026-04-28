@@ -9,8 +9,8 @@ extends Node
 @export var spawn_height_offset: float = -0.75
 
 const MUTATION_MIN: float = 0.1
-const MUTATION_MAX: float = 4.0
-const MUTATION_FAVORED_MIN: float = 0.25
+const MUTATION_MAX: float = 3.0
+const MUTATION_FAVORED_MIN: float = 0.2
 const MUTATION_FAVORED_MAX: float = 1.2
 const MUTATION_FAVORED_WEIGHT: float = 0.8
 

@@ -271,8 +271,8 @@ offset_right = 115.0
 offset_bottom = 191.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/h_separation = 60
-theme_override_constants/v_separation = 33
+theme_override_constants/h_separation = 44
+theme_override_constants/v_separation = 24
 columns = 2
 
 [node name="MovementControls" type="CenterContainer" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1433167443]
@@ -312,8 +312,10 @@ layout_mode = 2
 texture = SubResource("AtlasTexture_1acrt")
 
 [node name="LCont" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/MovementControls/VBoxContainer/VBoxContainer" unique_id=441493293]
+custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 texture = ExtResource("7_8egab")
+expand_mode = 1
 stretch_mode = 5
 
 [node name="MovementLabel" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1402713521]
@@ -334,12 +336,17 @@ layout_mode = 2
 theme_override_constants/separation = 9
 
 [node name="M1" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/AttackControls/VBoxContainer/VBoxContainer" unique_id=885372167]
+custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 texture = SubResource("AtlasTexture_1a85y")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="RTCont" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/AttackControls/VBoxContainer/VBoxContainer" unique_id=1521000114]
+custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 texture = ExtResource("9_svtp6")
+expand_mode = 1
 stretch_mode = 5
 
 [node name="AttackLabel" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=64579065]
@@ -360,12 +367,17 @@ layout_mode = 2
 theme_override_constants/separation = 9
 
 [node name="M2" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/ParryControls/VBoxContainer/VBoxContainer" unique_id=1453605177]
+custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 texture = SubResource("AtlasTexture_hl5e0")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="LTCont" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/ParryControls/VBoxContainer/VBoxContainer" unique_id=1690801040]
+custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 texture = ExtResource("11_1dfpl")
+expand_mode = 1
 stretch_mode = 5
 
 [node name="ParryLabel" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=647253121]
@@ -390,8 +402,10 @@ layout_mode = 2
 texture = SubResource("AtlasTexture_engjn")
 
 [node name="ACont" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/DodgeControls/VBoxContainer/VBoxContainer" unique_id=1867091448]
+custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 texture = ExtResource("13_qywvv")
+expand_mode = 1
 stretch_mode = 5
 
 [node name="DodgeLabel" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1545770480]
@@ -412,12 +426,16 @@ layout_mode = 2
 theme_override_constants/separation = 9
 
 [node name="Q" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/LockOnControls/VBoxContainer/VBoxContainer" unique_id=794950755]
+custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 texture = SubResource("AtlasTexture_vr8o3")
+expand_mode = 1
 
 [node name="RCont" type="TextureRect" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls/LockOnControls/VBoxContainer/VBoxContainer" unique_id=1440555843]
+custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 texture = ExtResource("15_3wgol")
+expand_mode = 1
 stretch_mode = 5
 
 [node name="LockOnLabel" type="Label" parent="Elements/Root/ControlsPanel/HBoxContainer/Controls/ColorRect/Controls" unique_id=1570893993]

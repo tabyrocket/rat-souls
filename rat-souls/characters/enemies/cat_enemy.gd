@@ -152,7 +152,7 @@ func _physics_process(delta: float) -> void:
 		if not _has_valid_player():
 			return
 
-	if global_position.y < -30.0:
+	if global_position.y < -5.0:
 		queue_free()
 		return
 

@@ -170,7 +170,6 @@ theme_override_font_sizes/font_size = 32
 text = "Main Menu"
 
 [node name="SettingsPanel" type="ColorRect" parent="." unique_id=593864363]
-visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -231,6 +230,7 @@ vertical_alignment = 1
 
 [node name="HSlider" type="HSlider" parent="SettingsPanel/VBoxContainer/Settings/SensitivitySettings/VBoxContainer/MouseSens" unique_id=1825059787]
 layout_mode = 2
+focus_neighbor_bottom = NodePath("../../ContSens/HSlider")
 max_value = 2.0
 step = 0.01
 value = 1.0
@@ -247,6 +247,8 @@ vertical_alignment = 1
 
 [node name="HSlider" type="HSlider" parent="SettingsPanel/VBoxContainer/Settings/SensitivitySettings/VBoxContainer/ContSens" unique_id=1110188273]
 layout_mode = 2
+focus_neighbor_top = NodePath("../../MouseSens/HSlider")
+focus_neighbor_bottom = NodePath("../../../../../CenterContainer/BackButton")
 max_value = 2.0
 step = 0.01
 value = 1.0
@@ -270,6 +272,7 @@ vertical_alignment = 1
 
 [node name="HSlider" type="HSlider" parent="SettingsPanel/VBoxContainer/Settings/VolumeSettings/VBoxContainer/MasterVol" unique_id=172029282]
 layout_mode = 2
+focus_neighbor_bottom = NodePath("../../BGMusic/HSlider")
 max_value = 2.0
 step = 0.01
 value = 1.0
@@ -286,6 +289,8 @@ vertical_alignment = 1
 
 [node name="HSlider" type="HSlider" parent="SettingsPanel/VBoxContainer/Settings/VolumeSettings/VBoxContainer/BGMusic" unique_id=590910334]
 layout_mode = 2
+focus_neighbor_top = NodePath("../../MasterVol/HSlider")
+focus_neighbor_bottom = NodePath("../../SFX/HSlider")
 max_value = 2.0
 step = 0.01
 value = 1.0
@@ -302,6 +307,8 @@ vertical_alignment = 1
 
 [node name="HSlider" type="HSlider" parent="SettingsPanel/VBoxContainer/Settings/VolumeSettings/VBoxContainer/SFX" unique_id=1927416251]
 layout_mode = 2
+focus_neighbor_top = NodePath("../../BGMusic/HSlider")
+focus_neighbor_bottom = NodePath("../../../../../CenterContainer/BackButton")
 max_value = 2.0
 step = 0.01
 value = 1.0
@@ -312,6 +319,9 @@ layout_mode = 2
 [node name="BackButton" type="Button" parent="SettingsPanel/VBoxContainer/CenterContainer" unique_id=1702297076]
 custom_minimum_size = Vector2(70, 50)
 layout_mode = 2
+focus_neighbor_left = NodePath("../../Settings/SensitivitySettings/VBoxContainer/ContSens/HSlider")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../../Settings/VolumeSettings/VBoxContainer/SFX/HSlider")
 text = "Back"
 
 [node name="GameOverPanel" type="ColorRect" parent="." unique_id=1064749623]
