@@ -15,13 +15,13 @@ run/main_scene="uid://bhrkujncagqvj"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
-[autoload]
-
-PSXResolution="*res://scenes/psx_resolution.gd"
-
 [audio]
 
 buses/default_bus_layout="uid://de000jff3efls"
+
+[autoload]
+
+PSXResolution="*res://scenes/psx_resolution.gd"
 
 [display]
 
@@ -133,10 +133,8 @@ pause={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
-scaling_3d/mode=0
-scaling_3d/scale=0.5
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 shading/overrides/force_vertex_shading=true
-anti_aliasing/quality/msaa_3d=0
+scaling_3d/scale=0.5
