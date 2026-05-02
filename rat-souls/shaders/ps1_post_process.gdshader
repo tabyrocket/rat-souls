@@ -4,7 +4,7 @@ uniform sampler2D screen_texture: hint_screen_texture, repeat_disable, filter_ne
 uniform float scanline_intensity : hint_range(0.0, 1.0) = 0.22;
 uniform float vignette_intensity : hint_range(0.0, 1.0) = 0.12;
 uniform float vignette_softness : hint_range(0.0, 2.0) = 1.2;
-uniform float aberration_amount : hint_range(0.0, 0.01) = 0.005;
+uniform float aberration_amount : hint_range(0.0, 0.01) = 0.008;
 
 const float ps1_dither[16] = float[16](
 	-4.0, 0.0, -3.0, 1.0,
