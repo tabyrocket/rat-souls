@@ -78,6 +78,18 @@ const KILL_PUNS: Array[String] = [
 	"A rat to be reckoned with.",
 	"Rat king material.",
 	"Pounced back.",
+	"MOUSE-CLES!!!",
+	"Cheese the day.",
+	"Cat-ch me if you can.",
+	"That's un-fur-tunate.",
+	"Rat-ical victory.",
+	"It's not easy being cheesy.",
+	"Paw-sitively lethal",
+	"Meow-sacre.",
+	"Fur-bidden power",
+	"Cat-astrophjcally outmatched.",
+	"Paw-lease stop.",
+	"Claw-ver move."
 ]
 const PUN_COLORS: Array[Color] = [
 	Color(1.0, 0.85, 0.2), # Gold
