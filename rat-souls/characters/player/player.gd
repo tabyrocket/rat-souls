@@ -101,6 +101,12 @@ var death_ui_shown: bool = false
 var startup_physics_freeze_timer: float = 0.0
 var startup_action_block_timer: float = 0.0
 
+# Dodge afterimage
+var _afterimage_timer: float = 0.0
+const AFTERIMAGE_INTERVAL: float = 0.04
+const AFTERIMAGE_DURATION: float = 0.18
+const AFTERIMAGE_COLOR: Color = Color(0.6, 0.85, 1.0, 0.4)
+
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -163,6 +169,7 @@ func _physics_process(delta: float) -> void:
 	_update_horizontal_velocity(direction, delta)
 	_update_lock_on_orientation(delta)
 	_update_rig_animation(direction)
+	_update_afterimage(delta)
 
 	_apply_gravity(delta)
 	_lock_rotation_constraints()
@@ -599,6 +606,7 @@ func _try_start_dodge(direction: Vector3) -> void:
 		dodge_timer = dodge_duration
 		dodge_cooldown_timer = dodge_cooldown
 		dodge_sfx.play()
+		_afterimage_timer = 0.0
 
 		dodge_direction = direction
 		if dodge_direction == Vector3.ZERO:
@@ -682,6 +690,47 @@ func _apply_gravity(delta: float) -> void:
 		velocity.y = 0.0
 
 
+func _update_afterimage(delta: float) -> void:
+	if not is_dodging:
+		return
+	if visual_model == null or not is_instance_valid(visual_model):
+		return
+
+	_afterimage_timer -= delta
+	if _afterimage_timer > 0.0:
+		return
+	_afterimage_timer = AFTERIMAGE_INTERVAL
+
+	# Spawn a ghostly duplicate mesh at the current position
+	for child in visual_model.find_children("*", "MeshInstance3D", true, false):
+		if not (child is MeshInstance3D):
+			continue
+		var source_mesh: MeshInstance3D = child as MeshInstance3D
+		if source_mesh.mesh == null:
+			continue
+
+		var ghost := MeshInstance3D.new()
+		ghost.mesh = source_mesh.mesh
+		ghost.top_level = true
+		ghost.global_transform = source_mesh.global_transform
+		ghost.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+		var mat := StandardMaterial3D.new()
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mat.albedo_color = AFTERIMAGE_COLOR
+		mat.no_depth_test = true
+		ghost.material_override = mat
+
+		get_parent().add_child(ghost)
+
+		# Fade and remove
+		var tween: Tween = ghost.create_tween()
+		tween.tween_property(mat, "albedo_color:a", 0.0, AFTERIMAGE_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tween.finished.connect(ghost.queue_free)
+		break  # Only clone the first mesh to keep it lightweight
+
+
 func _lock_rotation_constraints() -> void:
 	rotation.x = 0.0
 	rotation.z = 0.0
@@ -689,6 +738,10 @@ func _lock_rotation_constraints() -> void:
 
 func _on_attack_area_body_entered(body: Node3D) -> void:
 	if is_attacking and body.has_method("take_damage") and not body in hit_bodies:
+		# Hitstop on player attack landing — makes hits feel HEAVY
+		if has_node("/root/ScreenEffects"):
+			get_node("/root/ScreenEffects").hitstop(0.045)
+			get_node("/root/ScreenEffects").shake(0.14, 0.12)
 		hit_bodies.append(body)
 		body.take_damage(attack_damage, self)
 
@@ -696,6 +749,14 @@ func _on_attack_area_body_entered(body: Node3D) -> void:
 func _trigger_hit_flash() -> void:
 	if combat_visual_feedback != null:
 		combat_visual_feedback.trigger_hit_flash()
+
+
+func _update_health_vignette() -> void:
+	if not has_node("/root/ScreenEffects"):
+		return
+	var max_health: float = 5.0
+	var ratio: float = clamp(health / max_health, 0.0, 1.0)
+	get_node("/root/ScreenEffects").update_health_vignette(ratio)
 
 
 func _die() -> void:
@@ -750,6 +811,10 @@ func take_damage(amount, source) -> void:
 	if is_parrying:
 		print("[Parry] SUCCESS. Blocked", amount, "damage from", source.name)
 		print("[Parry] Remaining parry window:", max(parry_timer, 0.0), "seconds")
+		# PARRY JUICE: bigger hitstop + screen shake for that satisfying crunch
+		if has_node("/root/ScreenEffects"):
+			get_node("/root/ScreenEffects").hitstop(0.09)
+			get_node("/root/ScreenEffects").shake(0.35, 0.18)
 		if source is Node3D:
 			_face_attack_side_toward(source as Node3D)
 		else:
@@ -768,12 +833,16 @@ func take_damage(amount, source) -> void:
 		return
 
 	health -= amount
+	_update_health_vignette()
 	if health <= 0:
 		_die()
 		return
 
 	_trigger_hit_flash()
 	damaged_sfx.play()
+	# Screen shake on taking damage — sells the brutality
+	if has_node("/root/ScreenEffects"):
+		get_node("/root/ScreenEffects").shake(0.25, 0.15)
 	print("Player hit! Health:", health)
 	
 	is_attacking = false

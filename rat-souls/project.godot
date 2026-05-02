@@ -22,6 +22,7 @@ buses/default_bus_layout="uid://de000jff3efls"
 [autoload]
 
 PSXResolution="*res://scenes/psx_resolution.gd"
+ScreenEffects="*res://scenes/screen_effects.gd"
 
 [display]
 

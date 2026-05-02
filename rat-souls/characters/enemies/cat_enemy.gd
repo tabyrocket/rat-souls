@@ -790,9 +790,12 @@ func take_damage(amount, source) -> void:
 
 	if health <= 0:
 		is_defeated = true
-		death_timer = 5.0
+		death_timer = 2.5
 		_release_attack_claim()
 		emit_signal("defeated", self)
+		# Notify UI of kill for pun display
+		if has_node("/root/ScreenEffects"):
+			get_node("/root/ScreenEffects").register_kill()
 		if combat_visual_feedback != null:
 			combat_visual_feedback.hide_star()
 		var hb: Node = get_node_or_null("EnemyHealthBar")
