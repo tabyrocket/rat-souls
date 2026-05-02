@@ -24,6 +24,7 @@ const BUS_MASTER: StringName = &"Master"
 const BUS_BGM: StringName = &"BGM"
 const BUS_SFX: StringName = &"SFX"
 const MIN_LINEAR_VOLUME: float = 0.0001
+const SETTINGS_FILE_PATH: String = "user://settings.cfg"
 
 var player: Node = null
 var health_max: float = 1.0
@@ -42,17 +43,13 @@ func _ready() -> void:
 	_refresh_player_reference()
 	_cache_player_sensitivity_defaults()
 	_cache_bus_volume_defaults()
-	_connect_menu_signals()
 	health_bar.step = 0.01
 	stamina_bar.step = 0.01
 	pause_panel.hide()
 	settings_panel.hide()
 	game_over_panel.hide()
-	mouse_sensitivity_slider.value = 1.0
-	controller_sensitivity_slider.value = 1.0
-	master_volume_slider.value = 1.0
-	bgm_volume_slider.value = 1.0
-	sfx_volume_slider.value = 1.0
+	_load_settings()
+	_connect_menu_signals()
 	_apply_sensitivity_settings()
 	_apply_volume_settings()
 	target_indicator.hide()
@@ -214,22 +211,27 @@ func _on_exit_button_pressed() -> void:
 
 func _on_mouse_sensitivity_slider_value_changed(_value: float) -> void:
 	_apply_sensitivity_settings()
+	_save_settings()
 
 
 func _on_controller_sensitivity_slider_value_changed(_value: float) -> void:
 	_apply_sensitivity_settings()
+	_save_settings()
 
 
 func _on_master_volume_slider_value_changed(value: float) -> void:
 	_apply_bus_volume_multiplier(BUS_MASTER, base_master_volume_linear, value)
+	_save_settings()
 
 
 func _on_bgm_volume_slider_value_changed(value: float) -> void:
 	_apply_bus_volume_multiplier(BUS_BGM, base_bgm_volume_linear, value)
+	_save_settings()
 
 
 func _on_sfx_volume_slider_value_changed(value: float) -> void:
 	_apply_bus_volume_multiplier(BUS_SFX, base_sfx_volume_linear, value)
+	_save_settings()
 
 
 func _apply_stats_immediately() -> void:
@@ -327,3 +329,24 @@ func show_game_over() -> void:
 func _focus_retry_button() -> void:
 	if game_over_panel.visible:
 		retry_button.grab_focus()
+
+
+func _load_settings() -> void:
+	var config := ConfigFile.new()
+	config.load(SETTINGS_FILE_PATH)
+	mouse_sensitivity_slider.value = config.get_value("Settings", "mouse_sensitivity", 1.0)
+	controller_sensitivity_slider.value = config.get_value("Settings", "controller_sensitivity", 1.0)
+	master_volume_slider.value = config.get_value("Settings", "master_volume", 1.0)
+	bgm_volume_slider.value = config.get_value("Settings", "bgm_volume", 1.0)
+	sfx_volume_slider.value = config.get_value("Settings", "sfx_volume", 1.0)
+
+
+func _save_settings() -> void:
+	var config := ConfigFile.new()
+	config.load(SETTINGS_FILE_PATH)
+	config.set_value("Settings", "mouse_sensitivity", mouse_sensitivity_slider.value)
+	config.set_value("Settings", "controller_sensitivity", controller_sensitivity_slider.value)
+	config.set_value("Settings", "master_volume", master_volume_slider.value)
+	config.set_value("Settings", "bgm_volume", bgm_volume_slider.value)
+	config.set_value("Settings", "sfx_volume", sfx_volume_slider.value)
+	config.save(SETTINGS_FILE_PATH)
