@@ -89,7 +89,8 @@ const KILL_PUNS: Array[String] = [
 	"Fur-bidden power",
 	"Cat-astrophjcally outmatched.",
 	"Paw-lease stop.",
-	"Claw-ver move."
+	"Claw-ver move.",
+	"The cat is purr-manently out of commission."
 ]
 const PUN_COLORS: Array[Color] = [
 	Color(1.0, 0.85, 0.2), # Gold

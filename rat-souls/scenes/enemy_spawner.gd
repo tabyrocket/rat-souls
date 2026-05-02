@@ -109,7 +109,7 @@ func _get_current_enemy_cap() -> int:
 	if is_instance_valid(game_manager) and game_manager.has_method("get_score"):
 		score = game_manager.get_score()
 	
-	var scaled_cap: float = float(enemy_cap_base) + (float(score) * 0.5)
+	var scaled_cap: float = float(enemy_cap_base) + (float(score) * 0.2)
 	return int(floor(max(1.0, scaled_cap)))
 
 
