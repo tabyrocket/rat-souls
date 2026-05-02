@@ -3,12 +3,12 @@
 [ext_resource type="PackedScene" uid="uid://3kuq0wfqgwca" path="res://characters/player/player.tscn" id="1_g7g4h"]
 [ext_resource type="Texture2D" uid="uid://dk7pyoxf07ucc" path="res://icon.svg" id="2_nd71p"]
 [ext_resource type="Texture2D" uid="uid://c7irgmhcsyycu" path="res://assets/images/soil-seamless-texture-2k-pixel-exr-5-jpg-5-29-01.jpg" id="2_s36qc"]
-[ext_resource type="AudioStream" uid="uid://coynmlws2v3om" path="res://assets/sound/bgm/challenge_music.mp3" id="4_7ddre"]
 [ext_resource type="Script" uid="uid://ba76xfok4c48a" path="res://scenes/game_manager.gd" id="4_rnaij"]
 [ext_resource type="Texture2D" uid="uid://cs5ghb3pmcnet" path="res://assets/world/rogland_clear_night_4k.exr" id="4_s36qc"]
 [ext_resource type="PackedScene" uid="uid://jnkio4dvpi3" path="res://ui/ui.tscn" id="6_3qnke"]
 [ext_resource type="PackedScene" uid="uid://dlseu03u7maj0" path="res://ui/psx_view.tscn" id="7_wtsjf"]
 [ext_resource type="AudioStream" uid="uid://b3kt6tfcdw4sw" path="res://assets/sound/bgm/sad-meow-song.mp3" id="8_6qxox"]
+[ext_resource type="AudioStream" uid="uid://cgjw70agwh7ou" path="res://assets/sound/bgm/nion_official-mmm-ominous-111728.mp3" id="8_gthg3"]
 [ext_resource type="Script" uid="uid://r6oj6j5slrxy" path="res://scenes/enemy_spawner.gd" id="8_spawner"]
 [ext_resource type="Script" uid="uid://s2wivcs8xyxk" path="res://scenes/sun.gd" id="9_sun"]
 
@@ -94,8 +94,7 @@ script = ExtResource("4_rnaij")
 script = ExtResource("8_spawner")
 
 [node name="BGM" type="AudioStreamPlayer" parent="." unique_id=711614748]
-stream = ExtResource("4_7ddre")
-volume_db = -80.0
+stream = ExtResource("8_gthg3")
 autoplay = true
 bus = &"BGM"
 
