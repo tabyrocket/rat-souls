@@ -10,8 +10,7 @@
 
 ---
 
-**The Rat's End** is a stylised, retro-inspired action game combining high-impact combat with a branching narrative. Built in Godot, it features a custom PS1 aesthetic, dynamic difficulty scaling, and a data-driven dialogue system that responds to player choices.
-
+**The Rat's End** is a stylised, retro-inspired action game combining high-impact combat with a immense difficulty. Built in Godot, it features a custom PS1 aesthetic and dynamic difficulty scaling.
 ## 📸 Screenshots
 <div align="center">
   <img src="planning/screenshots/ss1.png" width="48%">
